@@ -8,7 +8,7 @@ public abstract class AuctionPage {
     String url;
     private final HashSet<String> oldItems;
 
-    AuctionPage(String url) {
+    public AuctionPage(String url) {
         this.url = url;
 
         oldItems = getAllItems().stream()

@@ -3,6 +3,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import page.AyPage;
+import page.KufarPage;
 import page.MeshokPage;
 
 import javax.naming.directory.InvalidAttributesException;
@@ -32,6 +33,8 @@ public class PageWatcherConfig {
                     watchers.add(new PageWatcher(new AyPage(url), bot));
                 } else if (host.toLowerCase(Locale.ROOT).equals("meshok.net")) {
                     watchers.add(new PageWatcher(new MeshokPage(url), bot));
+                } else if (host.toLowerCase(Locale.ROOT).equals("www.kufar.by")) {
+                    watchers.add(new PageWatcher(new KufarPage(url), bot));
                 } else {
                     throw new InvalidAttributesException("Unknown link type");
                 }
