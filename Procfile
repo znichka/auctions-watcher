@@ -1,1 +1,1 @@
-worker: java -cp target/classes:target/dependency/* checker.Runner
+worker: java -cp target/classes:target/dependency/* Scheduler
