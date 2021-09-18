@@ -34,7 +34,6 @@ public class PageWatcherConfig {
         TelegramBot bot = new TelegramBot(config.token, config.userId);
 
         for (PageDescription pageDescription : config.pages) {
-
             String host = new URL(pageDescription.url).getHost().toLowerCase(Locale.ROOT);
             AuctionPage auctionPage;
             try {
@@ -45,12 +44,11 @@ public class PageWatcherConfig {
                 } else if (host.contains("kufar.by")) {
                     auctionPage = new KufarPage(pageDescription.url);
                 } else {
-                    throw new InvalidAttributesException("Unknown link type");
+                    throw new InvalidAttributesException(String.format("Unknown link type for %s. Check the configuration file", pageDescription.description));
                 }
                 watchers.add(new PageWatcher(auctionPage, pageDescription.description, bot, pageDescription.period));
-            } catch (InvalidAttributesException | IOException e) {
-//                e.printStackTrace();
-                bot.sendMessage("Unknown link type" + pageDescription.url + "\nCheck the configuration file\n");
+            } catch (InvalidAttributesException e) {
+                bot.sendMessage(e.getMessage());
             }
         }
         return watchers;
