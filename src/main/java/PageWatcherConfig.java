@@ -1,45 +1,56 @@
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import page.AuctionPage;
 import page.AyPage;
 import page.KufarPage;
 import page.MeshokPage;
 
 import javax.naming.directory.InvalidAttributesException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-@AllArgsConstructor
+
 @NoArgsConstructor
-@Getter
 @Setter
+@Getter
 public class PageWatcherConfig {
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    static class PageDescription {
+        private String url;
+        private String description;
+        private Integer period;
+    }
+
     private String token;
     private String userId;
-    private List<String> urls;
-    private Integer timeout;
+    private List<PageDescription> pages;
 
-    public static List<PageWatcher> generateWatchersByConfig(PageWatcherConfig config) throws MalformedURLException {
+    public static List<PageWatcher> generateWatchersByConfig(PageWatcherConfig config) throws IOException {
         List<PageWatcher> watchers = new ArrayList<>();
-        TelegramBot bot = new TelegramBot(config.getToken(), config.getUserId());
+        TelegramBot bot = new TelegramBot(config.token, config.userId);
 
-        for (String url : config.getUrls()) {
-            String host = new URL(url).getHost();
+        for (PageDescription pageDescription : config.pages) {
+
+            String host = new URL(pageDescription.url).getHost().toLowerCase(Locale.ROOT);
+            AuctionPage auctionPage;
             try {
-                if (host.toLowerCase(Locale.ROOT).equals("antiques.ay.by")) {
-                    watchers.add(new PageWatcher(new AyPage(url), bot));
-                } else if (host.toLowerCase(Locale.ROOT).equals("meshok.net")) {
-                    watchers.add(new PageWatcher(new MeshokPage(url), bot));
-                } else if (host.toLowerCase(Locale.ROOT).equals("www.kufar.by")) {
-                    watchers.add(new PageWatcher(new KufarPage(url), bot));
+                if (host.contains("antiques.ay.by")) {
+                    auctionPage = new AyPage(pageDescription.url);
+                } else if (host.contains("meshok.net")) {
+                    auctionPage = new MeshokPage(pageDescription.url);
+                } else if (host.contains("kufar.by")) {
+                    auctionPage = new KufarPage(pageDescription.url);
                 } else {
                     throw new InvalidAttributesException("Unknown link type");
                 }
+                watchers.add(new PageWatcher(auctionPage, pageDescription.description, bot, pageDescription.period));
             } catch (InvalidAttributesException | IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                bot.sendMessage("Unknown link type" + pageDescription.url + "\nCheck the configuration file\n");
             }
         }
         return watchers;

@@ -19,8 +19,9 @@ public class Scheduler {
                 () -> new InvalidObjectException(CONFIG_JSON + " is not set in the environment"));
 
         PageWatcherConfig config = new ObjectMapper().readValue(json, PageWatcherConfig.class);
+
         PageWatcherConfig.generateWatchersByConfig(config)
-                         .forEach(watcher -> scheduler.scheduleAtFixedRate(watcher, 0, config.getTimeout(), MINUTES));
+                         .forEach(watcher -> scheduler.scheduleAtFixedRate(watcher, 0, watcher.period, MINUTES));
 
     }
 }
