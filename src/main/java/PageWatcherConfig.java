@@ -1,10 +1,7 @@
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import page.AuctionPage;
-import page.AyPage;
-import page.KufarPage;
-import page.MeshokPage;
+import page.*;
 
 import javax.naming.directory.InvalidAttributesException;
 import java.io.IOException;
@@ -43,6 +40,8 @@ public class PageWatcherConfig {
                     auctionPage = new MeshokPage(pageDescription.url);
                 } else if (host.contains("kufar.by")) {
                     auctionPage = new KufarPage(pageDescription.url);
+                } else if (host.contains("avito.ru")) {
+                    auctionPage = new AvitoPage(pageDescription.url);
                 } else {
                     throw new InvalidAttributesException(String.format("Unknown link type for %s. Check the configuration file", pageDescription.description));
                 }
