@@ -13,7 +13,8 @@ public class PageWatcher implements Runnable {
     TelegramBot bot;
     Integer period;
     LocalDateTime lastUpdate;
-    public final static Integer TIMEOUT_HOURS = 6;
+    final static Long TIMEOUT_HOURS = 6L;
+    Long timeoutCheck = TIMEOUT_HOURS;
 
     public PageWatcher(AuctionPage page, String pageDescription, TelegramBot bot, Integer period) throws IOException {
         this.page = page;
@@ -30,10 +31,14 @@ public class PageWatcher implements Runnable {
         List<ItemDescription> newItems = page.getNewItems();
         if (newItems.size() == 0) {
             Long timeout = ChronoUnit.HOURS.between(lastUpdate, LocalDateTime.now());
-            if (timeout >= TIMEOUT_HOURS && timeout % TIMEOUT_HOURS == 0) //todo don't send each run after timeout
+            if (timeout >= timeoutCheck) {
                 bot.sendMessage(String.format("There were no updates for %s for %d hours", pageDescription, timeout));
+                timeoutCheck += TIMEOUT_HOURS;
+            }
         } else {
             lastUpdate = LocalDateTime.now();
+            timeoutCheck = TIMEOUT_HOURS;
+
             newItems.forEach(item -> {
                 try {
                     bot.sendImageUpload(item.getPhotoUrl(), item.getCaption(), item.getItemUrl());
