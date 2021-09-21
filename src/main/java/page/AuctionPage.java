@@ -24,7 +24,7 @@ public abstract class AuctionPage {
         }
     }
 
-    abstract List<ItemDescription> getAllItems();
+    public abstract List<ItemDescription> getAllItems();
 
     public List<ItemDescription> getNewItems() {
         try {

@@ -27,11 +27,10 @@ public class PageWatcher implements Runnable {
 
     @SneakyThrows
     public void run() {
-
         List<ItemDescription> newItems = page.getNewItems();
         if (newItems.size() == 0) {
             Long timeout = ChronoUnit.HOURS.between(lastUpdate, LocalDateTime.now());
-            if (timeout >= TIMEOUT_HOURS && timeout % TIMEOUT_HOURS == 0)
+            if (timeout >= TIMEOUT_HOURS && timeout % TIMEOUT_HOURS == 0) //todo don't send each run after timeout
                 bot.sendMessage(String.format("There were no updates for %s for %d hours", pageDescription, timeout));
         } else {
             lastUpdate = LocalDateTime.now();
