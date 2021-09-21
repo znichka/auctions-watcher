@@ -42,7 +42,9 @@ public class PageWatcherConfig {
                     auctionPage = new KufarPage(pageDescription.url);
                 } else if (host.contains("avito.ru")) {
                     auctionPage = new AvitoPage(pageDescription.url);
-                } else {
+                } else if (host.contains("ebay")) {
+                    auctionPage = new EbayPage(pageDescription.url);
+                }else {
                     throw new InvalidAttributesException(String.format("Unknown link type for %s. Check the configuration file", pageDescription.description));
                 }
                 watchers.add(new PageWatcher(auctionPage, pageDescription.description, bot, pageDescription.period));
