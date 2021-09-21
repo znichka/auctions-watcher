@@ -27,10 +27,12 @@ public class EbayPage extends AuctionPage {
             for (Element card : cards) {
                 try {
                     Element imgElement = card.getElementsByClass("s-item__image-img").first();
+                    if (imgElement == null) throw new Exception("Error while parsing element, skipping item");
                     String photoUrl = imgElement.attr("src");
                     String caption = imgElement.attr("alt");
 
                     Element linkElement = card.getElementsByClass("s-item__link").first();
+                    if (linkElement == null) throw new Exception("Error while parsing element, skipping item");
                     String itemUrl = linkElement.attr("href");
                     String id = itemUrl.substring(25, 37);
 
