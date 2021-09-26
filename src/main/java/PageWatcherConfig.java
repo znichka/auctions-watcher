@@ -36,15 +36,17 @@ public class PageWatcherConfig {
             try {
                 if (host.contains("antiques.ay.by")) {
                     auctionPage = new AyPage(pageDescription.url);
-                } else if (host.contains("meshok.net")) {
+                } else if (host.contains("meshok")) {
                     auctionPage = new MeshokPage(pageDescription.url);
-                } else if (host.contains("kufar.by")) {
+                } else if (host.contains("kufar")) {
                     auctionPage = new KufarPage(pageDescription.url);
-                } else if (host.contains("avito.ru")) {
+                } else if (host.contains("avito")) {
                     auctionPage = new AvitoPage(pageDescription.url);
                 } else if (host.contains("ebay")) {
                     auctionPage = new EbayPage(pageDescription.url);
-                }else {
+                } else if (host.contains("etsy")) {
+                    auctionPage = new EbayPage(pageDescription.url);
+                } else {
                     throw new InvalidAttributesException(String.format("Unknown link type for %s. Check the configuration file", pageDescription.description));
                 }
                 watchers.add(new PageWatcher(auctionPage, pageDescription.description, bot, pageDescription.period));

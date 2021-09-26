@@ -32,7 +32,7 @@ public class PageWatcher implements Runnable {
         if (newItems.size() == 0) {
             Long timeout = ChronoUnit.HOURS.between(lastUpdate, LocalDateTime.now());
             if (timeout >= timeoutCheck) {
-                bot.sendMessage(String.format("There were no updates for %s for %d hours", pageDescription, timeout));
+                bot.sendMessage(String.format("There were no updates for %s for %d hours", pageDescription, timeoutCheck));
                 timeoutCheck += TIMEOUT_HOURS;
             }
         } else {
