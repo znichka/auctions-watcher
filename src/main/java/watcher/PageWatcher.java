@@ -2,7 +2,6 @@ package watcher;
 
 import description.PageDescription;
 import lombok.SneakyThrows;
-import parser.PageParser;
 import description.ItemDescription;
 
 import java.io.IOException;

@@ -1,17 +1,13 @@
 package config;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Locale;
-
 public enum HostType {
-    MESHOK("meshok"),
+    MESHOK("meshok.net"),
     AYBY("ay.by"),
-    KUFAR("kufar"),
-    AVITO("avito"),
+    KUFAR("kufar.by"),
+    AVITO("avito.ru"),
     EBAYCOM("ebay.com"),
     EBAYDE("ebay.de"),
-    ETSY("etsy"),
+    ETSY("etsy.com"),
     UNKNOWN("unknown");
 
     public final String host;
@@ -20,10 +16,9 @@ public enum HostType {
         this.host = host;
     }
 
-    public static HostType getHostType(String url) throws MalformedURLException {
-        String host = new URL(url).getHost().toLowerCase(Locale.ROOT);
+    public static HostType getHostType(String url) {
         for (HostType e : HostType.values())
-            if (host.contains(e.host)) return e;
+            if (url.contains(e.host)) return e;
         return UNKNOWN;
     }
 }

@@ -32,8 +32,21 @@ public class AuctionWatcherConfig {
         }
     }
 
+    public static HashMap<HostType, TelegramBot> getBotsByConfig(ConfigDescription config){
+        HashMap<HostType, TelegramBot> bots = new HashMap<>();
+        for (Map.Entry<String, List<String>> token : config.getTokens().entrySet()){
+            TelegramBot bot = new TelegramBot(token.getKey(), config.getUserId());
+            for (String name : token.getValue()){
+                HostType hostType = HostType.getHostType(name);
+                bots.put(hostType, bot);
+            }
+        }
+        return bots;
+    }
+
     public static Collection<AuctionWatcher> generateAuctionWatchersByConfig(ConfigDescription config) {
-        TelegramBot bot = new TelegramBot(config.getToken(), config.getUserId());
+
+        HashMap<HostType, TelegramBot> bots = getBotsByConfig(config);
         HashMap<HostType, AuctionWatcher> auctionWatchers = new HashMap<>();
 
         for (PageDescription pageDescription : config.getPages()) {
@@ -42,8 +55,13 @@ public class AuctionWatcherConfig {
                 if (hostType == UNKNOWN)
                     throw new InvalidAttributesException(String.format("Unknown link type %s. Check the configuration file", pageDescription.getUrl()));
 
-                if (!auctionWatchers.containsKey(hostType))
-                    auctionWatchers.put(hostType, new AuctionWatcher(bot, getParserByHostType(hostType)));
+                if (!auctionWatchers.containsKey(hostType)) {
+                    TelegramBot bot = bots.get(hostType);
+                    PageParser parser = getParserByHostType(hostType);
+                    if (bot == null) throw new InvalidAttributesException(String.format("There is no corresponding bot for that link: %s", pageDescription.getUrl()));
+                    if (parser == null) throw new InvalidAttributesException(String.format("There is no corresponding parser for that link: %s", pageDescription.getUrl()));
+                    auctionWatchers.put(hostType, new AuctionWatcher(bot, parser));
+                }
 
                 auctionWatchers.get(hostType).registerPage(pageDescription);
             } catch (Exception e){
