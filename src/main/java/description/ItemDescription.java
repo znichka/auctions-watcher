@@ -1,4 +1,4 @@
-package page;
+package description;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
+import config.AuctionWatcherConfig;
+import description.ConfigDescription;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -6,7 +8,6 @@ import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class Scheduler {
     private final static ScheduledExecutorService scheduler =
@@ -17,11 +18,9 @@ public class Scheduler {
     public static void main(String[] args) throws IOException {
         String json = Optional.ofNullable(System.getenv(CONFIG_JSON)).orElseThrow(
                 () -> new InvalidObjectException(CONFIG_JSON + " is not set in the environment"));
+        ConfigDescription config = new ObjectMapper().readValue(json, ConfigDescription.class);
 
-        PageWatcherConfig config = new ObjectMapper().readValue(json, PageWatcherConfig.class);
-
-        PageWatcherConfig.generateWatchersByConfig(config)
-                         .forEach(watcher -> scheduler.scheduleAtFixedRate(watcher, 0, watcher.period, MINUTES));
-
+        AuctionWatcherConfig.generateAuctionWatchersByConfig(config)
+                         .forEach(auctionWatcher -> auctionWatcher.schedulePages(scheduler));
     }
 }

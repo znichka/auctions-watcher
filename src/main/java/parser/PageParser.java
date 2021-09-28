@@ -1,5 +1,6 @@
-package page;
+package parser;
 
+import description.ItemDescription;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -8,13 +9,12 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EtsyPage extends AuctionPage{
-    public EtsyPage(String url) {
-        super(url);
-    }
+public abstract class PageParser {
+    protected abstract Elements getElementCardsList(Document doc);
 
-    @Override
-    public List<ItemDescription> getAllItems() {
+    protected abstract ItemDescription getItemFromCard(Element card);
+
+    public final List<ItemDescription> getAllItems(String url) {
         List<ItemDescription> items = new ArrayList<>();
         try {
             Document doc = Jsoup.connect(url)
@@ -22,18 +22,11 @@ public class EtsyPage extends AuctionPage{
                     .referrer("http://www.google.com")
                     .timeout(1000*5)
                     .get();
-
-            Elements cards = doc.getElementsByClass("listing-link");
-            for (Element card : cards) {
+            Elements cards = getElementCardsList(doc);
+            for (Element card : cards){
                 try {
-                    String caption = card.attr("title");
-                    String itemUrl = card.attr("href");
-                    String id = card.attr("data-listing-id");
-
-                    Element imgElement = card.getElementsByTag("img").first();
-                    String photoUrl = imgElement.attr("src");
-
-                    items.add(new ItemDescription(id, itemUrl, photoUrl, caption));
+                    ItemDescription item = getItemFromCard(card);
+                    if (item != null) items.add(item);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
