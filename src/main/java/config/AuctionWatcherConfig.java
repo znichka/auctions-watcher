@@ -3,6 +3,7 @@ package config;
 import bot.TelegramBot;
 import description.ConfigDescription;
 import description.PageDescription;
+import lombok.extern.java.Log;
 import parser.*;
 import watcher.AuctionWatcher;
 
@@ -11,9 +12,10 @@ import java.util.*;
 
 import static config.HostType.*;
 
+@Log
 public class AuctionWatcherConfig {
     public static PageParser getParserByHostType(HostType hostType) {
-        switch (hostType){
+        switch (hostType) {
             case AYBY:
                 return new AyPageParser();
             case MESHOK:
@@ -32,11 +34,11 @@ public class AuctionWatcherConfig {
         }
     }
 
-    public static HashMap<HostType, TelegramBot> getBotsByConfig(ConfigDescription config){
+    public static HashMap<HostType, TelegramBot> getBotsByConfig(ConfigDescription config) {
         HashMap<HostType, TelegramBot> bots = new HashMap<>();
-        for (Map.Entry<String, List<String>> token : config.getTokens().entrySet()){
+        for (Map.Entry<String, List<String>> token : config.getTokens().entrySet()) {
             TelegramBot bot = new TelegramBot(token.getKey(), config.getUserId());
-            for (String name : token.getValue()){
+            for (String name : token.getValue()) {
                 HostType hostType = HostType.getHostType(name);
                 bots.put(hostType, bot);
             }
@@ -58,14 +60,16 @@ public class AuctionWatcherConfig {
                 if (!auctionWatchers.containsKey(hostType)) {
                     TelegramBot bot = bots.get(hostType);
                     PageParser parser = getParserByHostType(hostType);
-                    if (bot == null) throw new InvalidAttributesException(String.format("There is no corresponding bot for that link: %s", pageDescription.getUrl()));
-                    if (parser == null) throw new InvalidAttributesException(String.format("There is no corresponding parser for that link: %s", pageDescription.getUrl()));
+                    if (bot == null)
+                        throw new InvalidAttributesException(String.format("There is no corresponding bot for that link: %s", pageDescription.getUrl()));
+                    if (parser == null)
+                        throw new InvalidAttributesException(String.format("There is no corresponding parser for that link: %s", pageDescription.getUrl()));
                     auctionWatchers.put(hostType, new AuctionWatcher(bot, parser));
                 }
 
                 auctionWatchers.get(hostType).registerPage(pageDescription);
-            } catch (Exception e){
-                e.printStackTrace();
+            } catch (Exception e) {
+                log.severe(e.getMessage());
             }
         }
         return auctionWatchers.values();

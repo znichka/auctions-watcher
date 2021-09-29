@@ -1,6 +1,7 @@
 package bot;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 import okhttp3.*;
 
 import java.io.BufferedInputStream;
@@ -11,6 +12,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 @AllArgsConstructor
+@Log
 public class TelegramBot {
     private final String token;
     private final String chatId;
@@ -21,7 +23,7 @@ public class TelegramBot {
             URLConnection conn = url.openConnection();
             InputStream is = new BufferedInputStream(conn.getInputStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.severe(String.format("Error while sending telegram response: %s", response));
         }
     }
 

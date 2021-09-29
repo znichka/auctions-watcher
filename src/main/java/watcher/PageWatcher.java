@@ -1,10 +1,10 @@
 package watcher;
 
+import description.ItemDescription;
 import description.PageDescription;
 import lombok.SneakyThrows;
-import description.ItemDescription;
+import lombok.extern.java.Log;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Log
 public class PageWatcher implements Runnable {
     AuctionWatcher auctionWatcher;
     PageDescription pageDescription;
@@ -21,7 +22,7 @@ public class PageWatcher implements Runnable {
     final static Long TIMEOUT_HOURS = 6L;
     Long timeoutCheck = TIMEOUT_HOURS;
 
-    PageWatcher(AuctionWatcher auctionWatcher, PageDescription pageDescription) throws IOException {
+    PageWatcher(AuctionWatcher auctionWatcher, PageDescription pageDescription) {
         this.auctionWatcher = auctionWatcher;
         this.pageDescription = pageDescription;
 
@@ -31,9 +32,11 @@ public class PageWatcher implements Runnable {
                     .collect(Collectors.toCollection(HashSet::new));
         } catch (Exception e) {
             oldItems = new HashSet<>();
+            log.warning(String.format("Error while initialising oldItems a in PageWatcher class. Page info: %s", pageDescription.getDescription()));
         }
 
         auctionWatcher.send(String.format("Watcher for %s has started", pageDescription.getDescription()));
+        log.info(String.format("Watcher for %s has started", pageDescription.getDescription()));
         lastUpdate = LocalDateTime.now();
     }
 
@@ -47,17 +50,21 @@ public class PageWatcher implements Runnable {
                     .filter(item -> oldItems.add(item.getId()))
                     .collect(Collectors.toList());
         } catch (Exception e) {
+            log.warning(String.format("Error while getting new items for a page. Page info: %s", pageDescription.getDescription()));
             return new ArrayList<>();
         }
     }
 
     @SneakyThrows
     public void run() {
+        log.info(String.format("Run for a page - %s", pageDescription.getDescription()));
         List<ItemDescription> newItems = getNewItems();
         if (newItems.size() == 0) {
             Long timeout = ChronoUnit.HOURS.between(lastUpdate, LocalDateTime.now());
             if (timeout >= timeoutCheck) {
                 auctionWatcher.send(String.format("There were no updates for %s for %d hours", pageDescription.getDescription(), timeoutCheck));
+                log.info(String.format("There were no updates for %s for %d hours", pageDescription.getDescription(), timeoutCheck));
+
                 timeoutCheck += TIMEOUT_HOURS;
             }
         } else {

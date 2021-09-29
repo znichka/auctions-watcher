@@ -1,6 +1,7 @@
 package parser;
 
 import description.ItemDescription;
+import lombok.extern.java.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,6 +10,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
+@Log
 public abstract class PageParser {
     protected abstract Elements getElementCardsList(Document doc);
 
@@ -28,11 +30,11 @@ public abstract class PageParser {
                     ItemDescription item = getItemFromCard(card);
                     if (item != null) items.add(item);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.warning("Error while parsing an item on a page, skipping. Url: "+ url);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warning("Error while parsing a page, skipping. Url: "+ url);
         }
         return items;
     }
