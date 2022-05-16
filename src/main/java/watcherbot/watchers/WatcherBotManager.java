@@ -29,7 +29,6 @@ public class WatcherBotManager {
         registeredPageWatchers = new ArrayList<>();
     }
 
-
     public void registerPageWatcher(PageWatcher watcher) {
         registeredPageWatchers.add(watcher);
     }

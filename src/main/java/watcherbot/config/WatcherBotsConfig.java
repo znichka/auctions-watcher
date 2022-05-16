@@ -11,6 +11,7 @@ import watcherbot.description.BotCredentials;
 import watcherbot.description.ConfigDescription;
 import watcherbot.description.PageDescription;
 import watcherbot.description.WatcherBotDescription;
+import watcherbot.parser.ParserFactory;
 import watcherbot.watchers.PageWatcher;
 import watcherbot.watchers.WatcherBotManager;
 
@@ -27,13 +28,13 @@ import java.util.concurrent.ScheduledExecutorService;
 public class WatcherBotsConfig {
     private final static String CONFIG_JSON = "CONFIG_JSON";
 
-    private final ParserFactory availibleParsers;
+    private final ParserFactory availableParsers;
     private final TelegramBotSender sender;
     private final ScheduledExecutorService scheduledExecutorService;
 
     @Autowired
-    public WatcherBotsConfig(ParserFactory availibleParsers, TelegramBotSender sender, ScheduledExecutorService scheduledExecutorService) {
-        this.availibleParsers = availibleParsers;
+    public WatcherBotsConfig(ParserFactory availableParsers, TelegramBotSender sender, ScheduledExecutorService scheduledExecutorService) {
+        this.availableParsers = availableParsers;
         this.sender = sender;
         this.scheduledExecutorService = scheduledExecutorService;
     }
@@ -70,7 +71,7 @@ public class WatcherBotsConfig {
 
             for (PageDescription pageDescription : watcherBotDescription.getPages()) {
                 try {
-                    PageWatcher pageWatcher = new PageWatcher(availibleParsers.getParserFor(pageDescription.getUrl()), pageDescription, manager);
+                    PageWatcher pageWatcher = new PageWatcher(availableParsers.getParserFor(pageDescription.getUrl()), pageDescription, manager);
                     pageWatcher.schedule(scheduledExecutorService);
                     manager.registerPageWatcher(pageWatcher);
                 } catch (Exception e) {

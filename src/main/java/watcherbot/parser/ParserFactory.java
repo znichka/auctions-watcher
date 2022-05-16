@@ -1,4 +1,4 @@
-package watcherbot.config;
+package watcherbot.parser;
 
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
@@ -20,7 +20,6 @@ public class ParserFactory {
     private final Map<String, PageParser> parsers;
 
     @Autowired
-
     public ParserFactory(List<PageParser> availibleParsers) {
         parsers = availibleParsers.stream().collect(Collectors.toMap(PageParser::getDomainName, Function.identity()));
     }

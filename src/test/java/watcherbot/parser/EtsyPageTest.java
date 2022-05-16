@@ -1,15 +1,27 @@
 package watcherbot.parser;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import watcherbot.config.PageParserTestConfig;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertTrue;
 
-class EtsyPageTest {
+
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = {PageParserTestConfig.class})
+@Ignore
+public class EtsyPageTest {
+
+    @Autowired
+    EtsyPageParser etsyPageParser;
 
     @Test
-    void getAllItems() {
+    public void getAllItems() {
         String url = "https://www.etsy.com/search/vintage?explicit=1&q=glass+vintage+ornament&ship_to=BY&order=date_desc";
-        EtsyPageParser page = new EtsyPageParser();
-        assertTrue(page.getAllItems(url).size() > 0);
+        assertTrue(etsyPageParser.getAllItems(url).size() > 0);
     }
 }
