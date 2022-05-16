@@ -1,4 +1,4 @@
-package parser;
+package watcherbot.parser;
 
 import org.junit.jupiter.api.Test;
 
@@ -11,5 +11,4 @@ class MeshokPageTest {
         MeshokPageParser page = new MeshokPageParser();
         assertTrue(page.getAllItems(url).size() > 0);
     }
-
 }

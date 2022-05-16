@@ -1,4 +1,4 @@
-package parser;
+package watcherbot.parser;
 
 import org.junit.jupiter.api.Test;
 

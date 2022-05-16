@@ -1,1 +1,1 @@
-worker: java -cp target/classes:target/dependency/* Scheduler
+worker: java -cp target/classes:target/dependency/* watcherbot.Starter

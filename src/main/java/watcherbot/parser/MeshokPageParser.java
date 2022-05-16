@@ -1,10 +1,13 @@
-package parser;
+package watcherbot.parser;
 
-import description.ItemDescription;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+import watcherbot.description.ItemDescription;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+@Component
 public class MeshokPageParser extends PageParser {
     @Override
     public Elements getElementCardsList(Document doc) {
@@ -28,5 +31,10 @@ public class MeshokPageParser extends PageParser {
             return new ItemDescription(id, itemUrl, photoUrl, caption);
         }
         return null;
+    }
+
+    @Override
+    public String getDomainName() {
+        return "meshok";
     }
 }

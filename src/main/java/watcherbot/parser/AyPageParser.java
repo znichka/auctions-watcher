@@ -1,10 +1,13 @@
-package parser;
+package watcherbot.parser;
 
-import description.ItemDescription;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+import watcherbot.description.ItemDescription;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+@Component
 public class AyPageParser extends PageParser {
     @Override
     public Elements getElementCardsList(Document doc) {
@@ -20,5 +23,10 @@ public class AyPageParser extends PageParser {
         String photoUrl = item.selectFirst("img").attr("src");
         String caption = item.getElementsByClass("item-type-card__title").first().text();
         return new ItemDescription(id, itemUrl, photoUrl, caption);
+    }
+
+    @Override
+    public String getDomainName() {
+        return "ay";
     }
 }

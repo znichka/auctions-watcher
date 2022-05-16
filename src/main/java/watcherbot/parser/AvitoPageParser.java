@@ -1,10 +1,12 @@
-package parser;
+package watcherbot.parser;
 
-import description.ItemDescription;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
+import watcherbot.description.ItemDescription;
 
+@Component
 public class AvitoPageParser extends PageParser {
 
     @Override
@@ -28,5 +30,10 @@ public class AvitoPageParser extends PageParser {
         imageUrl = imageUrl.substring(19);
 
         return new ItemDescription(id, itemUrl, imageUrl, caption);
+    }
+
+    @Override
+    public String getDomainName() {
+        return "avito";
     }
 }

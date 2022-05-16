@@ -1,12 +1,13 @@
-package parser;
+package watcherbot.parser;
 
-import description.ItemDescription;
 import lombok.extern.java.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import watcherbot.description.ItemDescription;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,8 @@ public abstract class PageParser {
     protected abstract Elements getElementCardsList(Document doc);
 
     protected abstract ItemDescription getItemFromCard(Element card);
+
+    public abstract String getDomainName();
 
     public final List<ItemDescription> getAllItems(String url) {
         List<ItemDescription> items = new ArrayList<>();

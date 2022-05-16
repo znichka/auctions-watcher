@@ -1,6 +1,6 @@
-### Auctions watcher
+### Auctions watcherbot.watchers
 
-It's a Telegram bot notifier for new items in selected auction marketplaces.
+It's a Telegram watcherbot.bot notifier for new items in selected auction marketplaces.
 
 Supports pages from:
 - [meshok.net](https://meshok.net/)
@@ -18,14 +18,14 @@ The program needs a configuration file in json format. Example:
 
 ``` json
 { 
-    "token":"token-of-the-telegram-bot",
+    "token":"token-of-the-telegram-watcherbot.bot",
     "userId":"telegram-user-id",
     "pages":[
         {"url":"url to the page",
-        "description":"page description",
+        "watcherbot.description":"page watcherbot.description",
         "period":5}, // time interval for checking for the updates
         {"url":"url to the page 2",
-        "description":"page description 2",
+        "watcherbot.description":"page watcherbot.description 2",
         "period":5}
     ]
 }
