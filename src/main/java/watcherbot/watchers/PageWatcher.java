@@ -54,7 +54,6 @@ public class PageWatcher implements Runnable {
 
     @Autowired
     public void schedule(ScheduledExecutorService scheduledExecutorService){
-        System.out.println("page watcher registered");
         scheduledExecutorService.scheduleAtFixedRate(this, 0, pageDescription.getPeriod(), MINUTES);
     }
 

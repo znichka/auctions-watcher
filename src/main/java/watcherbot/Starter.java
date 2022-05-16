@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 public class Starter {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        context.getEnvironment().setActiveProfiles("local");//todo
         context.register(Starter.class);
         context.refresh();
     }

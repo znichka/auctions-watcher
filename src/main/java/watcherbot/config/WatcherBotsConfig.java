@@ -2,7 +2,6 @@ package watcherbot.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +18,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -52,8 +49,8 @@ public class WatcherBotsConfig {
         }
     }
 
-    @Bean
-    @Profile("!local")//todo
+    @Bean("configDescription")
+    @Profile("!local")
     public static ConfigDescription getEnvConfigDescription() throws IOException {
         String json = Optional.ofNullable(System.getenv(CONFIG_JSON)).orElseThrow(
                 () -> new InvalidObjectException(CONFIG_JSON + " is not set in the environment"));
@@ -66,7 +63,7 @@ public class WatcherBotsConfig {
     }
 
     @Autowired
-    public void configureWatchers(ConfigDescription config){
+    public void configureWatchers(ConfigDescription config) {
         for (WatcherBotDescription watcherBotDescription : config.getWatchers()) {
             BotCredentials credentials = new BotCredentials(watcherBotDescription.getToken(), config.getUserId());
             WatcherBotManager manager = new WatcherBotManager(sender, credentials);
