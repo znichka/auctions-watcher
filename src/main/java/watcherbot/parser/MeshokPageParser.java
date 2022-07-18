@@ -11,14 +11,14 @@ import org.jsoup.select.Elements;
 public class MeshokPageParser extends PageParser {
     @Override
     public Elements getElementCardsList(Document doc) {
-        return doc.getElementsByClass("itemCardList_47663");
+        return doc.select("div[class^=itemCardList]");
     }
 
     @Override
     public ItemDescription getItemFromCard(Element card) {
-        Element cardImage = card.getElementsByClass("m-item-card-image image_47663").first();
+        Element cardImage = card.select(".m-item-card-image").first();
         if (cardImage != null) {
-            Element itemTitleElement = card.getElementsByClass("itemTitle_47663").first();
+            Element itemTitleElement = card.select("div[class^=itemTitle]").first();
             String id = itemTitleElement.attr("data-itemcard");
 
             String itemUrl = cardImage.attr("href");
