@@ -11,6 +11,8 @@ import org.jsoup.select.Elements;
 public class EbayPageParser extends PageParser {
     @Override
     public Elements getElementCardsList(Document doc) {
+        Element count = doc.getElementsByClass("srp-controls__count-heading").first().selectFirst("span");
+        if (count.text().equals("0")) return new Elements() ;
         return doc.getElementsByClass("s-item__wrapper");
     }
 

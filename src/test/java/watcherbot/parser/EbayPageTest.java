@@ -19,5 +19,10 @@ public class EbayPageTest {
     public void getAllItems() {
         String url = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=glass+garland&_sacat=907&_sop=10";
         assertTrue(ebayPageParser.getAllItems(url).size() > 0);
+
+        url = "https://www.ebay.de/sch/i.html?_from=R40&_trksid=p2334524.m570.l1313&_nkw=wiltrud+elbert+christbaumschmuck&_sacat=0&LH_TitleDesc=0&_odkw=wiltrud+elbert&_osacat=0";
+        assertTrue(ebayPageParser.getAllItems(url).size() == 0);
+
+
     }
 }
