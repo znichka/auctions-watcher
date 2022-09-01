@@ -7,7 +7,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import watcherbot.description.ItemDescription;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,8 @@ public abstract class PageParser {
         List<ItemDescription> items = new ArrayList<>();
         try {
             Document doc = Jsoup.connect(url)
-                    .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
+//                    .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
+//                    .userAgent("Opera")
                     .referrer("http://www.google.com")
                     .timeout(1000*5)
                     .get();
