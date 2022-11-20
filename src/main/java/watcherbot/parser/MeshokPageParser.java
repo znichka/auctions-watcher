@@ -1,8 +1,7 @@
 package watcherbot.parser;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import watcherbot.description.ItemDescription;
+import watcherbot.description.PageItemDescription;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -15,7 +14,7 @@ public class MeshokPageParser extends PageParser {
     }
 
     @Override
-    public ItemDescription getItemFromCard(Element card) {
+    public PageItemDescription getItemFromCard(Element card) {
         Element cardImage = card.select(".m-item-card-image").first();
         if (cardImage != null) {
             Element itemTitleElement = card.select("div[class^=itemTitle]").first();
@@ -28,7 +27,7 @@ public class MeshokPageParser extends PageParser {
             String caption = itemTitleElement.text();
             itemUrl = "http://meshok.net" + itemUrl;
 
-            return new ItemDescription(id, itemUrl, photoUrl, caption);
+            return new PageItemDescription(id, itemUrl, photoUrl, caption);
         }
         return null;
     }

@@ -10,6 +10,6 @@ import java.util.List;
 @Setter
 @Getter
 public class ConfigDescription {
-    private List<WatcherBotDescription> watchers;
+    private List<PageWatchersManagerDescription> watchers;
     private String userId;
 }

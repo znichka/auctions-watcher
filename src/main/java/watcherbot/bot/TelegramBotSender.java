@@ -3,8 +3,7 @@ package watcherbot.bot;
 import lombok.extern.java.Log;
 import okhttp3.*;
 import org.springframework.stereotype.Component;
-import watcherbot.description.BotCredentials;
-
+import watcherbot.description.TelegramBotCredentials;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,13 +24,13 @@ public class TelegramBotSender {
         }
     }
 
-    public void sendMessage(BotCredentials credentials, String message) throws IOException {
+    public void sendMessage(TelegramBotCredentials credentials, String message) throws IOException {
         String response = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s";
         response = String.format(response, credentials.getToken(), credentials.getChatId(), message);
         send(response);
     }
 
-    public void sendImage(BotCredentials credentials, String photoUrl, String photoCaption, String itemLink) throws IOException {
+    public void sendImage(TelegramBotCredentials credentials, String photoUrl, String photoCaption, String itemLink) throws IOException {
         String response = "https://api.telegram.org/bot%s/sendPhoto?chat_id=%s&photo=%s&caption=%s&parse_mode=HTML";
         String caption =  String.format("<a href=\"%s\">%s</a>", itemLink, photoCaption);
 
@@ -39,7 +38,7 @@ public class TelegramBotSender {
         send(response);
     }
 
-    public void sendImageUpload(BotCredentials credentials, String photoUrl, String photoCaption, String itemUrl) throws IOException {
+    public void sendImageUpload(TelegramBotCredentials credentials, String photoUrl, String photoCaption, String itemUrl) throws IOException {
         String requestUrl = "https://api.telegram.org/bot%s/sendPhoto";
         String caption =  String.format("<a href=\"%s\">%s</a>", itemUrl, photoCaption);
 

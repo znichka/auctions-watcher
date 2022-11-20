@@ -1,8 +1,7 @@
 package watcherbot.parser;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import watcherbot.description.ItemDescription;
+import watcherbot.description.PageItemDescription;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -20,7 +19,7 @@ public class EbayPageParser extends PageParser {
     }
 
     @Override
-    public ItemDescription getItemFromCard(Element card) {
+    public PageItemDescription getItemFromCard(Element card) {
         Element imgElement = card.getElementsByClass("s-item__image-img").first();
         String photoUrl = imgElement.attr("src");
         String caption = imgElement.attr("alt");
@@ -29,7 +28,7 @@ public class EbayPageParser extends PageParser {
         String itemUrl = linkElement.attr("href");
         String id = itemUrl.substring(25, 37);
 
-        return new ItemDescription(id, itemUrl, photoUrl, caption);
+        return new PageItemDescription(id, itemUrl, photoUrl, caption);
     }
 
     @Override

@@ -7,13 +7,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import watcherbot.bot.TelegramBotSender;
-import watcherbot.description.BotCredentials;
+import watcherbot.description.TelegramBotCredentials;
 import watcherbot.description.ConfigDescription;
 import watcherbot.description.PageDescription;
-import watcherbot.description.WatcherBotDescription;
+import watcherbot.description.PageWatchersManagerDescription;
 import watcherbot.parser.ParserFactory;
 import watcherbot.watchers.PageWatcher;
-import watcherbot.watchers.WatcherBotManager;
+import watcherbot.watchers.PageWatchersManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,7 +25,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 @Log
 @Configuration
-public class WatcherBotsConfig {
+public class PageWatcherManagersConfig {
     private final static String CONFIG_JSON = "CONFIG_JSON";
 
     private final ParserFactory availableParsers;
@@ -33,7 +33,7 @@ public class WatcherBotsConfig {
     private final ScheduledExecutorService scheduledExecutorService;
 
     @Autowired
-    public WatcherBotsConfig(ParserFactory availableParsers, TelegramBotSender sender, ScheduledExecutorService scheduledExecutorService) {
+    public PageWatcherManagersConfig(ParserFactory availableParsers, TelegramBotSender sender, ScheduledExecutorService scheduledExecutorService) {
         this.availableParsers = availableParsers;
         this.sender = sender;
         this.scheduledExecutorService = scheduledExecutorService;
@@ -64,20 +64,20 @@ public class WatcherBotsConfig {
     }
 
     @Autowired
-    public void configureWatchers(ConfigDescription config) {
-        for (WatcherBotDescription watcherBotDescription : config.getWatchers()) {
-            BotCredentials credentials = new BotCredentials(watcherBotDescription.getToken(), config.getUserId());
-            WatcherBotManager manager = new WatcherBotManager(sender, credentials);
+    public void configurePageWatchers(ConfigDescription config) {
+        for (PageWatchersManagerDescription pageWatchersManagerDescription : config.getWatchers()) {
+            TelegramBotCredentials credentials = new TelegramBotCredentials(pageWatchersManagerDescription.getToken(), config.getUserId());
+            PageWatchersManager manager = new PageWatchersManager(sender, credentials);
 
-            for (PageDescription pageDescription : watcherBotDescription.getPages()) {
+            for (PageDescription pageDescription : pageWatchersManagerDescription.getPages()) {
                 try {
-                    PageWatcher pageWatcher = new PageWatcher(availableParsers.getParserFor(pageDescription.getUrl()), pageDescription, manager);
-                    pageWatcher.schedule(scheduledExecutorService);
-                    manager.registerPageWatcher(pageWatcher);
+                    manager.registerPageWatcher(new PageWatcher(availableParsers.getParserFor(pageDescription.getUrl()), pageDescription, manager));
                 } catch (Exception e) {
                     log.severe(e.getMessage());
                 }
             }
+
+            manager.schedulePageWatchers(scheduledExecutorService);
         }
     }
 }

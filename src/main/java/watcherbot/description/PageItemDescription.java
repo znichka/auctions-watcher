@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class ItemDescription {
+public class PageItemDescription {
     String id;
     String itemUrl;
     String photoUrl;
