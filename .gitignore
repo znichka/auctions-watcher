@@ -98,3 +98,6 @@ fabric.properties
 *.json
 *temp*
 */config jsons/
+
+auctions.yml
+update-service.sh

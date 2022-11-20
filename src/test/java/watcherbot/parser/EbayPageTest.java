@@ -1,16 +1,16 @@
 package watcherbot.parser;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import watcherbot.config.PageParserTestConfig;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(SpringRunner.class )
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {PageParserTestConfig.class})
 public class EbayPageTest {
     @Autowired
@@ -44,5 +44,14 @@ public class EbayPageTest {
     public void getAllItemsEbayDe_category() {
         String url = "https://www.ebay.de/b/Christbaum-Feiertagsschmuck/77988?Herstellungsjahr=1910%7C1920%7C1930%7C1900&mag=1&rt=nc&_pgn=2&_sop=10";
         assertTrue(ebayPageParser.getAllItems(url).size() > 0);
+    }
+
+    @Test
+    public void getNoItemsEbayCom2() {
+        String url = "https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2380057.m570.l1313&_nkw=wiltrud+elbert+christbaumschmuck&_sacat=0";
+        assertEquals(0, ebayPageParser.getAllItems(url).size());
+
+//        url = "https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2380057.m570.l1313&_nkw=wiltrud+elbert+christbaumschmuck&_sacat=0";
+//        assertEquals(0, ebayPageParser.getAllItems(url).size());
     }
 }
