@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import watcherbot.bot.TelegramBotSender;
-import watcherbot.description.TelegramBotCredentials;
+import watcherbot.bot.TelegramBotCredentials;
 import watcherbot.description.ConfigDescription;
 import watcherbot.description.PageDescription;
 import watcherbot.description.PageWatchersManagerDescription;
@@ -22,6 +22,7 @@ import java.io.InvalidObjectException;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Log
 @Configuration
@@ -67,7 +68,7 @@ public class PageWatcherManagersConfig {
     public void configurePageWatchers(ConfigDescription config) {
         for (PageWatchersManagerDescription pageWatchersManagerDescription : config.getWatchers()) {
             TelegramBotCredentials credentials = new TelegramBotCredentials(pageWatchersManagerDescription.getToken(), config.getUserId());
-            PageWatchersManager manager = new PageWatchersManager(sender, credentials);
+            PageWatchersManager manager = new PageWatchersManager(sender, credentials, scheduledExecutorService);
 
             for (PageDescription pageDescription : pageWatchersManagerDescription.getPages()) {
                 try {
@@ -76,8 +77,6 @@ public class PageWatcherManagersConfig {
                     log.severe(e.getMessage());
                 }
             }
-
-            manager.schedulePageWatchers(scheduledExecutorService);
         }
     }
 }

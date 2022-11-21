@@ -1,4 +1,4 @@
-package watcherbot.description;
+package watcherbot.bot;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

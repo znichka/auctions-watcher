@@ -1,9 +1,8 @@
 package watcherbot.bot;
 
 import lombok.extern.java.Log;
-import okhttp3.*;
 import org.springframework.stereotype.Component;
-import watcherbot.description.TelegramBotCredentials;
+import okhttp3.*;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;

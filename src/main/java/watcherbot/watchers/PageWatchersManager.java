@@ -2,7 +2,7 @@ package watcherbot.watchers;
 
 import lombok.extern.java.Log;
 import watcherbot.bot.TelegramBotSender;
-import watcherbot.description.TelegramBotCredentials;
+import watcherbot.bot.TelegramBotCredentials;
 import watcherbot.description.PageItemDescription;
 
 import java.io.IOException;
@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
@@ -17,13 +18,17 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 public class PageWatchersManager implements Runnable {
     private final TelegramBotSender sender;
     private final TelegramBotCredentials credentials;
+    private final ScheduledExecutorService scheduledExecutorService;
 
     private final Map<PageWatcher, LocalDateTime> pageWatchers;
     private final HashSet<String> sentItems;
+    private final int HEALTH_CHECK_TIMEOUT = 30;
 
-    public PageWatchersManager(TelegramBotSender sender, TelegramBotCredentials credentials) {
+    public PageWatchersManager(TelegramBotSender sender, TelegramBotCredentials credentials, ScheduledExecutorService scheduledExecutorService) {
         this.sender = sender;
         this.credentials = credentials;
+        this.scheduledExecutorService = scheduledExecutorService;
+        scheduledExecutorService.scheduleAtFixedRate(this, 0, HEALTH_CHECK_TIMEOUT, TimeUnit.MINUTES);
 
         sentItems = new HashSet<>();
         pageWatchers = new HashMap<>();
@@ -31,16 +36,11 @@ public class PageWatchersManager implements Runnable {
 
     public void registerPageWatcher(PageWatcher watcher) {
         pageWatchers.put(watcher, LocalDateTime.now());
-    }
+        scheduledExecutorService.scheduleAtFixedRate(watcher, 0, watcher.getPageDescription().getPeriod(), MINUTES);
 
-    public void schedulePageWatchers(ScheduledExecutorService scheduledExecutorService) {
-        for(PageWatcher pageWatcher : pageWatchers.keySet()) {
-            scheduledExecutorService.scheduleAtFixedRate(pageWatcher, 0, pageWatcher.getPageDescription().getPeriod(), MINUTES);
-
-            String message = String.format("Watcher for %s has been scheduled", pageWatcher.getPageDescription().getDescription());
-            send(message);
-            log.info(message);
-        }
+        String message = String.format("Watcher for %s has been scheduled", watcher.getPageDescription().getDescription());
+        send(message);
+        log.info(message);
     }
 
     public void sendUpdate(PageWatcher pageWatcher){
