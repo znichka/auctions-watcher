@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import watcherbot.bot.TelegramBotSender;
 import watcherbot.bot.TelegramBotCredentials;
+import watcherbot.bot.TelegramBotSender;
 import watcherbot.description.ConfigDescription;
 import watcherbot.description.PageDescription;
 import watcherbot.description.PageWatchersManagerDescription;
@@ -22,7 +22,6 @@ import java.io.InvalidObjectException;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Log
 @Configuration
@@ -72,7 +71,7 @@ public class PageWatcherManagersConfig {
 
             for (PageDescription pageDescription : pageWatchersManagerDescription.getPages()) {
                 try {
-                    manager.registerPageWatcher(new PageWatcher(availableParsers.getParserFor(pageDescription.getUrl()), pageDescription, manager));
+                    manager.registerPageWatcher(availableParsers.getParserFor(pageDescription.getUrl()), pageDescription);
                 } catch (Exception e) {
                     log.severe(e.getMessage());
                 }

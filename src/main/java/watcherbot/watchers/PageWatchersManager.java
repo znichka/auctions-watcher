@@ -1,14 +1,19 @@
 package watcherbot.watchers;
 
 import lombok.extern.java.Log;
-import watcherbot.bot.TelegramBotSender;
 import watcherbot.bot.TelegramBotCredentials;
+import watcherbot.bot.TelegramBotSender;
+import watcherbot.description.PageDescription;
 import watcherbot.description.PageItemDescription;
+import watcherbot.parser.PageParser;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +39,8 @@ public class PageWatchersManager implements Runnable {
         pageWatchers = new HashMap<>();
     }
 
-    public void registerPageWatcher(PageWatcher watcher) {
+    public void registerPageWatcher(PageParser parser, PageDescription pageDescription) {
+        PageWatcher watcher = new PageWatcher(parser, pageDescription, this);
         pageWatchers.put(watcher, LocalDateTime.now());
         scheduledExecutorService.scheduleAtFixedRate(watcher, 0, watcher.getPageDescription().getPeriod(), MINUTES);
 
