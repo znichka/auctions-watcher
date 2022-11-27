@@ -43,7 +43,7 @@ public class PageWatchersManager implements Runnable {
         log.info(message);
     }
 
-    public void sendUpdate(PageWatcher pageWatcher){
+    public synchronized void sendUpdate(PageWatcher pageWatcher){
         List<PageItemDescription> newItems = pageWatcher.getNewItems();
         if (newItems.size() != 0) {
             send(newItems);
@@ -51,7 +51,7 @@ public class PageWatchersManager implements Runnable {
         }
     }
 
-    public void send(List<PageItemDescription> items) {
+    public synchronized void send(List<PageItemDescription> items) {
         for(PageItemDescription item : items) {
             if (!sentItems.contains(item.getId())) {
                 try {

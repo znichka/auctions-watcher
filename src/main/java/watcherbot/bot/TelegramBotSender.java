@@ -37,7 +37,7 @@ public class TelegramBotSender {
         send(response);
     }
 
-    public void sendImageUpload(TelegramBotCredentials credentials, String photoUrl, String photoCaption, String itemUrl) throws IOException {
+    public synchronized void sendImageUpload(TelegramBotCredentials credentials, String photoUrl, String photoCaption, String itemUrl) throws IOException {
         String requestUrl = "https://api.telegram.org/bot%s/sendPhoto";
         String caption =  String.format("<a href=\"%s\">%s</a>", itemUrl, photoCaption);
 
