@@ -12,7 +12,6 @@ import watcherbot.description.ConfigDescription;
 import watcherbot.description.PageDescription;
 import watcherbot.description.PageWatchersManagerDescription;
 import watcherbot.parser.ParserFactory;
-import watcherbot.watchers.PageWatcher;
 import watcherbot.watchers.PageWatchersManager;
 
 import java.io.File;
@@ -67,7 +66,7 @@ public class PageWatcherManagersConfig {
     public void configurePageWatchers(ConfigDescription config) {
         for (PageWatchersManagerDescription pageWatchersManagerDescription : config.getWatchers()) {
             TelegramBotCredentials credentials = new TelegramBotCredentials(pageWatchersManagerDescription.getToken(), config.getUserId());
-            PageWatchersManager manager = new PageWatchersManager(sender, credentials, scheduledExecutorService);
+            PageWatchersManager manager = new PageWatchersManager(sender, credentials, scheduledExecutorService, pageWatchersManagerDescription.getName());
 
             for (PageDescription pageDescription : pageWatchersManagerDescription.getPages()) {
                 try {
