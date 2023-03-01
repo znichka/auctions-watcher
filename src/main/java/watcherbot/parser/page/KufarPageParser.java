@@ -1,32 +1,35 @@
-package watcherbot.parser;
+package watcherbot.parser.page;
 
 import org.springframework.stereotype.Component;
 import watcherbot.description.PageItemDescription;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import watcherbot.parser.AbstractPageParser;
 
 @Component
-public class EtsyPageParser extends PageParser {
+public class KufarPageParser extends AbstractPageParser {
     @Override
     public Elements getElementCardsList(Document doc) {
-        return doc.getElementsByClass("listing-link");
+        Element article = doc.getElementsByTag("article").get(0);
+        return article.getElementsByTag("a");
     }
 
     @Override
     public PageItemDescription getItemFromCard(Element card) {
-        String caption = card.attr("title");
         String itemUrl = card.attr("href");
-        String id = card.attr("data-listing-id");
+        String id = itemUrl.substring(itemUrl.length() - 9);
 
         Element imgElement = card.getElementsByTag("img").first();
-        String photoUrl = imgElement.attr("src");
+
+        String photoUrl = imgElement == null ? "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg" : imgElement.attr("data-src");
+        String caption = imgElement == null ? "Елочная игрушка": imgElement.attr("alt");
 
         return new PageItemDescription(id, itemUrl, photoUrl, caption);
     }
 
     @Override
     public String getDomainName() {
-        return "etsy";
+        return "kufar";
     }
 }

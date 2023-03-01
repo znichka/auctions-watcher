@@ -11,7 +11,7 @@ import watcherbot.bot.TelegramBotSender;
 import watcherbot.description.ConfigDescription;
 import watcherbot.description.PageDescription;
 import watcherbot.description.PageWatchersManagerDescription;
-import watcherbot.parser.ParserFactory;
+import watcherbot.parser.PageParserFactory;
 import watcherbot.watchers.PageWatchersManager;
 
 import java.io.File;
@@ -27,20 +27,20 @@ import java.util.concurrent.ScheduledExecutorService;
 public class PageWatcherManagersConfig {
     private final static String CONFIG_JSON = "CONFIG_JSON";
 
-    private final ParserFactory availableParsers;
+    private final PageParserFactory availableParsers;
     private final TelegramBotSender sender;
     private final ScheduledExecutorService scheduledExecutorService;
 
     @Autowired
-    public PageWatcherManagersConfig(ParserFactory availableParsers, TelegramBotSender sender, ScheduledExecutorService scheduledExecutorService) {
+    public PageWatcherManagersConfig(PageParserFactory availableParsers, TelegramBotSender sender, ScheduledExecutorService scheduledExecutorService) {
         this.availableParsers = availableParsers;
         this.sender = sender;
         this.scheduledExecutorService = scheduledExecutorService;
     }
 
     @Bean("configDescription")
-    @Profile("local")
-    public ConfigDescription getLocalConfigDescription() throws IOException {
+    @Profile({"local", "remotechrome"})
+    public static ConfigDescription getLocalConfigDescription() throws IOException {
         File file = new File("config-local-run.json");
         if (file.exists()) {
             return new ObjectMapper().readValue(file, ConfigDescription.class);
@@ -50,7 +50,7 @@ public class PageWatcherManagersConfig {
     }
 
     @Bean("configDescription")
-    @Profile("!local")
+    @Profile({"!local & !remotechrome" })
     public static ConfigDescription getEnvConfigDescription() throws IOException {
         String json = Optional.ofNullable(System.getenv(CONFIG_JSON)).orElseThrow(
                 () -> new InvalidObjectException(CONFIG_JSON + " is not set in the environment"));

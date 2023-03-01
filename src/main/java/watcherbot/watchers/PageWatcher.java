@@ -5,7 +5,7 @@ import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import watcherbot.description.PageDescription;
 import watcherbot.description.PageItemDescription;
-import watcherbot.parser.PageParser;
+import watcherbot.parser.AbstractPageParser;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,10 +17,10 @@ public class PageWatcher implements Runnable  {
     @Getter
     private final PageDescription pageDescription;
     private final PageWatchersManager manager;
-    private final PageParser parser;
+    private final AbstractPageParser parser;
     private HashSet<String> oldItems;
 
-    public PageWatcher(PageParser parser, PageDescription pageDescription, PageWatchersManager manager) {
+    public PageWatcher(AbstractPageParser parser, PageDescription pageDescription, PageWatchersManager manager) {
         this.pageDescription = pageDescription;
         this.parser = parser;
         this.manager = manager;

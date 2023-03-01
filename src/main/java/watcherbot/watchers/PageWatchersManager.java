@@ -5,7 +5,7 @@ import watcherbot.bot.TelegramBotCredentials;
 import watcherbot.bot.TelegramBotSender;
 import watcherbot.description.PageDescription;
 import watcherbot.description.PageItemDescription;
-import watcherbot.parser.PageParser;
+import watcherbot.parser.AbstractPageParser;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -41,7 +41,7 @@ public class PageWatchersManager implements Runnable {
         pageWatchers = new HashMap<>();
     }
 
-    public void registerPageWatcher(PageParser parser, PageDescription pageDescription) {
+    public void registerPageWatcher(AbstractPageParser parser, PageDescription pageDescription) {
         PageWatcher watcher = new PageWatcher(parser, pageDescription, this);
         pageWatchers.put(watcher, LocalDateTime.now());
         scheduledExecutorService.scheduleAtFixedRate(watcher, 0, watcher.getPageDescription().getPeriod(), MINUTES);

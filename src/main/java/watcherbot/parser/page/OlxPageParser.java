@@ -1,20 +1,21 @@
-package watcherbot.parser;
+package watcherbot.parser.page;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import watcherbot.description.PageItemDescription;
+import watcherbot.parser.AbstractPageParser;
 
 @Component
-public class OlxPageParser extends  PageParser{
+public class OlxPageParser extends AbstractPageParser {
     @Override
-    protected Elements getElementCardsList(Document doc) {
+    public Elements getElementCardsList(Document doc) {
         return doc.select("div[data-cy^=l-card]");
     }
 
     @Override
-    protected PageItemDescription getItemFromCard(Element card) {
+    public PageItemDescription getItemFromCard(Element card) {
         Element itemElement = card.selectFirst("a");
         if (itemElement != null) {
             Element imgElement = itemElement.selectFirst("img");

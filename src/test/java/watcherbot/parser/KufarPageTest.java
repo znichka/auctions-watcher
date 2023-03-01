@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import watcherbot.config.PageParserTestConfig;
+import watcherbot.parser.page.KufarPageParser;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

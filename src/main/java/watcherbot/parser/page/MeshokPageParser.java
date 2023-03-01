@@ -1,13 +1,23 @@
-package watcherbot.parser;
+package watcherbot.parser.page;
 
-import org.springframework.stereotype.Component;
-import watcherbot.description.PageItemDescription;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.springframework.stereotype.Component;
+import watcherbot.description.PageItemDescription;
+import watcherbot.parser.SeleniumAbstractPageParser;
 
 @Component
-public class MeshokPageParser extends PageParser {
+public class MeshokPageParser extends SeleniumAbstractPageParser {
+    @Override
+    protected ExpectedCondition<WebElement> expectedCondition() {
+        return ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[class^=itemCardList]"));
+    }
+
     @Override
     public Elements getElementCardsList(Document doc) {
         return doc.select("div[class^=itemCardList]");

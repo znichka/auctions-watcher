@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import watcherbot.parser.PageParser;
 
 import javax.naming.OperationNotSupportedException;
 import java.net.URL;
@@ -16,16 +15,16 @@ import java.util.stream.Collectors;
 
 @Component
 @Log
-public class ParserFactory {
-    private final Map<String, PageParser> parsers;
+public class PageParserFactory {
+    private final Map<String, AbstractPageParser> parsers;
 
     @Autowired
-    public ParserFactory(List<PageParser> availibleParsers) {
-        parsers = availibleParsers.stream().collect(Collectors.toMap(PageParser::getDomainName, Function.identity()));
+    public PageParserFactory(List<AbstractPageParser> availibleParsers) {
+        parsers = availibleParsers.stream().collect(Collectors.toMap(AbstractPageParser::getDomainName, Function.identity()));
     }
 
     @SneakyThrows
-    public PageParser getParserFor(String url) {
+    public AbstractPageParser getParserFor(String url) {
         URL urlWrapper = new URL(url);
         String[] hostParts = urlWrapper.getHost().split("\\.");
 
