@@ -19,7 +19,7 @@ public abstract class AbstractPageParser {
 
     public abstract String getDomainName();
 
-    protected Document getDocument(String url) throws IOException {
+    protected synchronized Document getDocument(String url) throws IOException {
         return Jsoup.connect(url)
 //                    .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
 //                    .userAgent("Opera")
@@ -28,7 +28,7 @@ public abstract class AbstractPageParser {
                 .get();
     }
 
-    public final List<PageItemDescription> getAllItems(String url) {
+    public synchronized final List<PageItemDescription> getAllItems(String url) {
         List<PageItemDescription> items = new ArrayList<>();
         try {
             Document doc = getDocument(url);

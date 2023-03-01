@@ -7,10 +7,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,16 +18,22 @@ import java.util.concurrent.TimeUnit;
 @Log
 @Configuration
 @PropertySource("application.properties")
+@EnableAspectJAutoProxy
+@ComponentScan("watcherbot.aspect")
 public class WebDriverConfig {
+//    @Autowired
+//    WebDriver webDriver;
 
-    @Bean
+    @Bean(destroyMethod = "quit", name = "webDriver")
+    @Scope("prototype")
     @Profile("local")
     public static WebDriver getLocalWebDriver() {
         WebDriverManager.chromedriver().setup();
         return new ChromeDriver();
     }
 
-    @Bean
+    @Bean(destroyMethod = "quit", name = "webDriver")
+    @Scope("prototype")
     @Profile({"!local"})
     public static WebDriver getRemoteWebDriver(@Value("${docker.chromedriver.url}") String dockerChomeDriverUrl ) throws ExecutionException, InterruptedException {
         ChromeOptions options = new ChromeOptions();

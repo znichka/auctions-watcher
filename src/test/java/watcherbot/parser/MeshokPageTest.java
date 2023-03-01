@@ -1,6 +1,5 @@
 package watcherbot.parser;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +25,17 @@ public class MeshokPageTest {
         assertTrue(meshokPageParser.getAllItems(url).size() > 0);
 
     }
+    @Test
+    public void getAllItemsSearch() {
+        String url = "https://meshok.net/en/listing?a_o=15&good=14299&reposted=N&search=%D0%B1%D1%83%D1%81%D1%8B&sort=beg_date&way=desc&reposted=N";
+        assertTrue(meshokPageParser.getAllItems(url).size() > 0);
 
-    @AfterEach
-    public void cleanup(){
-        meshokPageParser.destroy();
     }
+
+//    @AfterEach
+//    public void cleanup(){
+//        meshokPageParser.destroy();
+//    }
 
 
 }
