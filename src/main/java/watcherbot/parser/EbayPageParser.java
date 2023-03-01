@@ -20,13 +20,19 @@ public class EbayPageParser extends PageParser {
 
     @Override
     public PageItemDescription getItemFromCard(Element card) {
-        Element imgElement = card.getElementsByClass("s-item__image-img").first();
+        Element item = card.getElementsByClass("s-item__image").first();
+        item = item.getElementsByTag("a").first();
+
+        String itemUrl = item.attr("href");
+        itemUrl = itemUrl.substring(0 ,itemUrl.indexOf('?'));
+
+        String id = itemUrl.substring(itemUrl.length()-12);
+
+        Element imgElement = card.getElementsByClass("s-item__image-wrapper").first();
+        imgElement = imgElement.getElementsByTag("img").first();
+
         String photoUrl = imgElement.attr("src");
         String caption = imgElement.attr("alt");
-
-        Element linkElement = card.getElementsByClass("s-item__link").first();
-        String itemUrl = linkElement.attr("href");
-        String id = itemUrl.substring(25, 37);
 
         return new PageItemDescription(id, itemUrl, photoUrl, caption);
     }
