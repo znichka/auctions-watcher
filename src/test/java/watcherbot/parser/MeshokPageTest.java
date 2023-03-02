@@ -9,11 +9,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import watcherbot.config.PageParserTestConfig;
 import watcherbot.parser.page.MeshokPageParser;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("remotechrome")
+//@ActiveProfiles("local")
 @ContextConfiguration(classes = {PageParserTestConfig.class})
 public class MeshokPageTest {
     @Autowired
@@ -31,7 +32,12 @@ public class MeshokPageTest {
         assertTrue(meshokPageParser.getAllItems(url).size() > 0);
 
     }
+    @Test
+    public void getNoItemsSearch() {
+        String url = "https://meshok.net/en/listing?a=1&a_o=2&a_o=15&good=109&search=елочная+игрушка&pp=48&sort=beg_date&way=desc&reposted=N";
+        assertEquals(0, meshokPageParser.getAllItems(url).size());
 
+    }
 //    @AfterEach
 //    public void cleanup(){
 //        meshokPageParser.destroy();

@@ -21,9 +21,6 @@ import java.util.concurrent.TimeUnit;
 @EnableAspectJAutoProxy
 @ComponentScan("watcherbot.aspect")
 public class WebDriverConfig {
-//    @Autowired
-//    WebDriver webDriver;
-
     @Bean(destroyMethod = "quit", name = "webDriver")
     @Scope("prototype")
     @Profile("local")

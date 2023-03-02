@@ -29,10 +29,13 @@ public abstract class SeleniumAbstractPageParser extends AbstractPageParser  {
 
         driver.get(url);
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(expectedCondition());
-//        driver.close();
-
-        return Jsoup.parse(driver.getPageSource());
+        try {
+            wait.until(expectedCondition());
+            return Jsoup.parse(driver.getPageSource());
+        } catch (Exception e){
+            log.warning(String.format("Error while parsing the page, possible timeout. Url: %s", url));
+            throw e;
+        }
     }
 
     @PreDestroy
