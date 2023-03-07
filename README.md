@@ -4,11 +4,12 @@ It's a Telegram bot notifier for new items in selected auction marketplaces.
 
 Supports pages from:
 - [meshok.net](https://meshok.net/)
-- [avito.ru](https://avito.ru/)
-- [kufar.by](https://kufar.by/)
+- [<s>avito.ru</s>](https://avito.ru/)
+- [<s>kufar.by</s>](https://kufar.by/)
 - [antiques.ay.by](http://antiques.ay.by/) 
 - [etsy.com](https://www.etsy.com/)
 - [ebay.com](https://www.ebay.com/) and [ebay.de](https://www.ebay.de/)
+- [olx.pl](https://www.olx.pl/)
 
 
 
