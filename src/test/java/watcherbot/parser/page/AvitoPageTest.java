@@ -1,4 +1,4 @@
-package watcherbot.parser;
+package watcherbot.parser.page;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

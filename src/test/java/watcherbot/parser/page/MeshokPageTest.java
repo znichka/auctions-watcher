@@ -1,4 +1,4 @@
-package watcherbot.parser;
+package watcherbot.parser.page;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,10 +38,4 @@ public class MeshokPageTest {
         assertEquals(0, meshokPageParser.getAllItems(url).size());
 
     }
-//    @AfterEach
-//    public void cleanup(){
-//        meshokPageParser.destroy();
-//    }
-
-
 }
