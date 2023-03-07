@@ -8,6 +8,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import watcherbot.driver.AutoCloseableWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,21 +19,21 @@ import java.util.concurrent.TimeUnit;
 @Log
 @Configuration
 @PropertySource("application.properties")
-@EnableAspectJAutoProxy
-@ComponentScan("watcherbot.aspect")
+@ComponentScan("watcherbot.driver")
 public class WebDriverConfig {
     @Bean(destroyMethod = "quit", name = "webDriver")
     @Scope("prototype")
     @Profile("local")
-    public static WebDriver getLocalWebDriver() {
+    public static AutoCloseableWebDriver getLocalWebDriver() {
+
         WebDriverManager.chromedriver().setup();
-        return new ChromeDriver();
+        return new AutoCloseableWebDriver(new ChromeDriver());
     }
 
     @Bean(destroyMethod = "quit", name = "webDriver")
     @Scope("prototype")
     @Profile({"!local"})
-    public static WebDriver getRemoteWebDriver(@Value("${docker.chromedriver.url}") String dockerChomeDriverUrl ) throws ExecutionException, InterruptedException {
+    public static AutoCloseableWebDriver getRemoteWebDriver(@Value("${docker.chromedriver.url}") String dockerChomeDriverUrl ) throws ExecutionException, InterruptedException {
         ChromeOptions options = new ChromeOptions();
 
         options.addArguments("--no-sandbox");
@@ -51,6 +52,6 @@ public class WebDriverConfig {
         }).get();
 
         if (driver == null) log.severe("Web driver not created, possible timeout. Url is " + dockerChomeDriverUrl);
-        return driver;
+        return new AutoCloseableWebDriver(driver);
     }
 }
