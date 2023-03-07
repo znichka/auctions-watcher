@@ -23,13 +23,13 @@ public class TelegramBotSender {
         }
     }
 
-    public void sendMessage(TelegramBotCredentials credentials, String message) throws IOException {
+    public synchronized void sendMessage(TelegramBotCredentials credentials, String message) throws IOException {
         String response = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s";
         response = String.format(response, credentials.getToken(), credentials.getChatId(), message);
         send(response);
     }
 
-    public void sendImage(TelegramBotCredentials credentials, String photoUrl, String photoCaption, String itemLink) throws IOException {
+    public synchronized void sendImage(TelegramBotCredentials credentials, String photoUrl, String photoCaption, String itemLink) throws IOException {
         String response = "https://api.telegram.org/bot%s/sendPhoto?chat_id=%s&photo=%s&caption=%s&parse_mode=HTML";
         String caption =  String.format("<a href=\"%s\">%s</a>", itemLink, photoCaption);
 

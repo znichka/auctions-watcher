@@ -2,16 +2,18 @@ package watcherbot.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import watcherbot.bot.TelegramBotCredentials;
-import watcherbot.bot.TelegramBotSender;
 import watcherbot.description.ConfigDescription;
 import watcherbot.description.PageDescription;
 import watcherbot.description.PageWatchersManagerDescription;
-import watcherbot.parser.ParserFactory;
+import watcherbot.parser.PageParserFactory;
+import watcherbot.watchers.PageWatcher;
 import watcherbot.watchers.PageWatchersManager;
 
 import java.io.File;
@@ -24,23 +26,20 @@ import java.util.concurrent.ScheduledExecutorService;
 
 @Log
 @Configuration
+@EnableScheduling
 public class PageWatcherManagersConfig {
     private final static String CONFIG_JSON = "CONFIG_JSON";
 
-    private final ParserFactory availableParsers;
-    private final TelegramBotSender sender;
-    private final ScheduledExecutorService scheduledExecutorService;
-
     @Autowired
-    public PageWatcherManagersConfig(ParserFactory availableParsers, TelegramBotSender sender, ScheduledExecutorService scheduledExecutorService) {
-        this.availableParsers = availableParsers;
-        this.sender = sender;
-        this.scheduledExecutorService = scheduledExecutorService;
-    }
+    private  PageParserFactory availableParsers;
+    @Autowired
+    private ObjectProvider<PageWatcher> pageWatcherProvider;
+    @Autowired
+    private ObjectProvider<PageWatchersManager> pageWatchersManagerProvider;
 
     @Bean("configDescription")
-    @Profile("local")
-    public ConfigDescription getLocalConfigDescription() throws IOException {
+    @Profile({"local", "remotechrome"})
+    public static ConfigDescription getLocalConfigDescription() throws IOException {
         File file = new File("config-local-run.json");
         if (file.exists()) {
             return new ObjectMapper().readValue(file, ConfigDescription.class);
@@ -50,7 +49,7 @@ public class PageWatcherManagersConfig {
     }
 
     @Bean("configDescription")
-    @Profile("!local")
+    @Profile({"!local & !remotechrome" })
     public static ConfigDescription getEnvConfigDescription() throws IOException {
         String json = Optional.ofNullable(System.getenv(CONFIG_JSON)).orElseThrow(
                 () -> new InvalidObjectException(CONFIG_JSON + " is not set in the environment"));
@@ -65,12 +64,14 @@ public class PageWatcherManagersConfig {
     @Autowired
     public void configurePageWatchers(ConfigDescription config) {
         for (PageWatchersManagerDescription pageWatchersManagerDescription : config.getWatchers()) {
+
             TelegramBotCredentials credentials = new TelegramBotCredentials(pageWatchersManagerDescription.getToken(), config.getUserId());
-            PageWatchersManager manager = new PageWatchersManager(sender, credentials, scheduledExecutorService, pageWatchersManagerDescription.getName());
+            PageWatchersManager manager = pageWatchersManagerProvider.getObject(credentials, pageWatchersManagerDescription.getName());
 
             for (PageDescription pageDescription : pageWatchersManagerDescription.getPages()) {
                 try {
-                    manager.registerPageWatcher(availableParsers.getParserFor(pageDescription.getUrl()), pageDescription);
+                    PageWatcher watcher = pageWatcherProvider.getObject(availableParsers.getParserFor(pageDescription.getUrl()), pageDescription);
+                    manager.registerPageWatcher(watcher);
                 } catch (Exception e) {
                     log.severe(e.getMessage());
                 }

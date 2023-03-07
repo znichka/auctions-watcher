@@ -1,13 +1,14 @@
-package watcherbot.parser;
+package watcherbot.parser.page;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import watcherbot.description.PageItemDescription;
+import watcherbot.parser.AbstractPageParser;
 
 @Component
-public class AvitoPageParser extends PageParser {
+public class AvitoPageParser extends AbstractPageParser {
 
     @Override
     public Elements getElementCardsList(Document doc) {
