@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import watcherbot.config.PageParserFactoryTestConfig;
 import watcherbot.config.PageParserTestConfig;
 import watcherbot.parser.page.*;
 
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PageParserTestConfig.class})
+@ContextConfiguration(classes = {PageParserFactoryTestConfig.class})
 public class PageParserFactoryTest {
     @Autowired
     PageParserFactory pageParserFactory;
