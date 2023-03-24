@@ -1,8 +1,16 @@
 package watcherbot.bot;
 
 import lombok.extern.java.Log;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import okhttp3.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,35 +51,32 @@ public class TelegramBotSender {
 
         requestUrl = String.format(requestUrl, credentials.getToken());
 
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
-        Request request = new Request.Builder()
-                .url(photoUrl)
-                .method("GET", null)
-                .addHeader("User-Agent", "any")
-                .build();
-        Response response = client.newCall(request).execute();
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<byte[]> response
+                = restTemplate.getForEntity(photoUrl, byte[].class);
 
-        if (response.code() == 200) {
-            MediaType mediaType = MediaType.parse("text/plain");
-            RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                    .addFormDataPart("photo", "filename",
-                            RequestBody.create(MediaType.parse("application/octet-stream"), response.body().bytes()
-                            ))
-                    .addFormDataPart("chat_id", credentials.getChatId())
-                    .addFormDataPart("caption", caption)
-                    .addFormDataPart("parse_mode", "HTML")
-                    .build();
-            Request request2 = new Request.Builder()
-                    .url(requestUrl)
-                    .method("POST", body)
-                    .build();
-            Response response2 = client.newCall(request2).execute();
-            response.close();
-            response2.close();
-        }
-        else {
-            response.close();
+        if (response.getStatusCode().is2xxSuccessful()) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> map= new LinkedMultiValueMap<>();
+            map.add("chat_id", credentials.getChatId());
+            map.add("caption", caption);
+            map.add("parse_mode", "HTML");
+
+            HttpHeaders imageHeaders = new HttpHeaders();
+            imageHeaders.setContentType(MediaType.IMAGE_PNG);
+
+            HttpEntity<ByteArrayResource> imageAttachment;
+            ByteArrayResource fileAsResource = new ByteArrayResource(response.getBody());
+            imageAttachment = new HttpEntity<>(fileAsResource, imageHeaders);
+
+            map.add("photo", imageAttachment);
+
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
+            restTemplate.postForEntity(requestUrl, request , String.class);
+
+        } else {
             sendMessage(credentials, photoUrl);
             sendMessage(credentials, photoCaption);
         }
