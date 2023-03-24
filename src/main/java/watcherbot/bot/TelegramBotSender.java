@@ -5,11 +5,11 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import watcherbot.description.ItemDescription;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -45,41 +45,49 @@ public class TelegramBotSender {
         send(response);
     }
 
+
+
+    public synchronized void sendItemDescription(TelegramBotCredentials credentials, ItemDescription item) throws IOException {
+        sendImageUpload(credentials, item.getPhotoContents(), item.getCaption(), item.getItemUrl());
+    }
+
     public synchronized void sendImageUpload(TelegramBotCredentials credentials, String photoUrl, String photoCaption, String itemUrl) throws IOException {
-        String requestUrl = "https://api.telegram.org/bot%s/sendPhoto";
-        String caption =  String.format("<a href=\"%s\">%s</a>", itemUrl, photoCaption);
-
-        requestUrl = String.format(requestUrl, credentials.getToken());
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<byte[]> response
-                = restTemplate.getForEntity(photoUrl, byte[].class);
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-            MultiValueMap<String, Object> map= new LinkedMultiValueMap<>();
-            map.add("chat_id", credentials.getChatId());
-            map.add("caption", caption);
-            map.add("parse_mode", "HTML");
-
-            HttpHeaders imageHeaders = new HttpHeaders();
-            imageHeaders.setContentType(MediaType.IMAGE_PNG);
-
-            HttpEntity<ByteArrayResource> imageAttachment;
-            ByteArrayResource fileAsResource = new ByteArrayResource(response.getBody());
-            imageAttachment = new HttpEntity<>(fileAsResource, imageHeaders);
-
-            map.add("photo", imageAttachment);
-
-            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
-            restTemplate.postForEntity(requestUrl, request , String.class);
-
-        } else {
+        byte[] content = null;//getImageContent(photoUrl);
+        if (content != null) sendImageUpload(credentials, content, photoCaption, itemUrl);
+        else {
             sendMessage(credentials, photoUrl);
             sendMessage(credentials, photoCaption);
         }
     }
+
+    public synchronized void sendImageUpload(TelegramBotCredentials credentials, byte[] photoContent, String photoCaption, String itemUrl) throws IOException {
+        String requestUrl = "https://api.telegram.org/bot%s/sendPhoto";
+        String caption =  String.format("<a href=\"%s\">%s</a>", itemUrl, photoCaption);
+
+        requestUrl = String.format(requestUrl, credentials.getToken());
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, Object> map= new LinkedMultiValueMap<>();
+        map.add("chat_id", credentials.getChatId());
+        map.add("caption", caption);
+        map.add("parse_mode", "HTML");
+
+        HttpHeaders imageHeaders = new HttpHeaders();
+        imageHeaders.setContentType(MediaType.IMAGE_PNG);
+
+        HttpEntity<ByteArrayResource> imageAttachment;
+        ByteArrayResource fileAsResource = new ByteArrayResource(photoContent);
+        imageAttachment = new HttpEntity<>(fileAsResource, imageHeaders);
+
+        map.add("photo", imageAttachment);
+
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
+        restTemplate.postForEntity(requestUrl, request , String.class);
+
+    }
+
 
 }

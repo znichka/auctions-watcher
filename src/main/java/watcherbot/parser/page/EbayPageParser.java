@@ -4,7 +4,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
-import watcherbot.description.PageItemDescription;
+import watcherbot.description.ItemDescription;
 import watcherbot.parser.AbstractPageParser;
 
 @Component
@@ -20,7 +20,7 @@ public class EbayPageParser extends AbstractPageParser {
     }
 
     @Override
-    public PageItemDescription getItemFromCard(Element card) {
+    public ItemDescription getItemFromCard(Element card) {
         Element item = card.getElementsByClass("s-item__image").first();
         item = item.getElementsByTag("a").first();
 
@@ -35,7 +35,7 @@ public class EbayPageParser extends AbstractPageParser {
         String photoUrl = imgElement.attr("src");
         String caption = imgElement.attr("alt");
 
-        return new PageItemDescription(id, itemUrl, photoUrl, caption);
+        return new ItemDescription(id, itemUrl, photoUrl, caption);
     }
 
     @Override

@@ -9,9 +9,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import watcherbot.bot.TelegramBotCredentials;
 import watcherbot.bot.TelegramBotSender;
-import watcherbot.description.PageItemDescription;
+import watcherbot.description.ItemDescription;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -39,13 +40,16 @@ public class PageWatchersManager  {
     @Getter
     private final String name;
 
-    private final HashSet<String> sentItems;
+    private final HashSet<String> sentItemsIds;
+    private final HashSet<String> sentItemsHashes;
+//    private final HashSet<String> sentItems;
 
     public PageWatchersManager(TelegramBotCredentials credentials, String name) {
         this.credentials = credentials;
         this.name = name;
 
-        sentItems = new HashSet<>();
+        sentItemsIds = new HashSet<>();
+        sentItemsHashes = new HashSet<>();
         registeredPageWatchers = new ArrayList<>();
     }
 
@@ -53,7 +57,7 @@ public class PageWatchersManager  {
         Runnable runnable = () -> {
             try {
                 log.info(String.format("Run for a page - %s", pageWatcher.getDescription()));
-                List<PageItemDescription> newItems = pageWatcher.getNewItems();
+                List<ItemDescription> newItems = pageWatcher.getNewItems();
                 if (newItems.size() != 0) {
                     log.info(String.format("New items for %s page for %s bot", pageWatcher.getDescription(), getName()));
                     send(newItems);
@@ -66,20 +70,23 @@ public class PageWatchersManager  {
         scheduledExecutorService.scheduleAtFixedRate(runnable, pageWatcher.getPeriod(), pageWatcher.getPeriod(), MINUTES);
 
         registeredPageWatchers.add(pageWatcher);
-        send("Page watcher for "+pageWatcher.getDescription() + " has been added");
+        send("Page watcher for " + pageWatcher.getDescription() + " has been added");
 
     }
 
-    public synchronized void send(List<PageItemDescription> items) {
+    public synchronized void send(List<ItemDescription> items) {
         log.info("Update for the " + name + " bot");
-        for(PageItemDescription item : items) {
-            if (!sentItems.contains(item.getId())) {
-                try {
-                    sender.sendImageUpload(credentials, item.getPhotoUrl(), item.getCaption(), item.getItemUrl());
-                } catch (IOException e) {
+        for(ItemDescription item : items) {
+            if (sentItemsIds.add(item.getId())) {
+                try  {
+                    if (sentItemsHashes.add(item.getPhotoHash()))
+                        sender.sendItemDescription(credentials, item);
+
+                    //todo algorithm exception to image description
+                } catch (IOException | NoSuchAlgorithmException e) {
                     log.severe(String.format("Error while sending item details to telegram bot %s. Item photo url: %s, item url: %s", name, item.getPhotoUrl(), item.getItemUrl()));
                 }
-                sentItems.add(item.getId());
+//                sentItemsIds.add(item.getId());
             }
         }
     }

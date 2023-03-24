@@ -5,7 +5,7 @@ import lombok.extern.java.Log;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import watcherbot.description.PageDescription;
-import watcherbot.description.PageItemDescription;
+import watcherbot.description.ItemDescription;
 import watcherbot.parser.AbstractPageParser;
 
 import java.time.LocalDateTime;
@@ -48,9 +48,9 @@ public class PageWatcher {
 //        manager.send("Page watcher for "+pageDescription.getDescription() + "has been added");
     }
 
-    public List<PageItemDescription> getNewItems() {
+    public List<ItemDescription> getNewItems() {
         try {
-            List<PageItemDescription> items = parser.getAllItems(url).stream()
+            List<ItemDescription> items = parser.getAllItems(url).stream()
                     .filter(item -> oldItems.add(item.getId()))
                     .collect(Collectors.toList());
             if (items.size() != 0)

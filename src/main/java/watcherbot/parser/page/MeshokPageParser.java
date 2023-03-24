@@ -8,7 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.springframework.stereotype.Component;
-import watcherbot.description.PageItemDescription;
+import watcherbot.description.ItemDescription;
 import watcherbot.parser.SeleniumAbstractPageParser;
 
 @Component
@@ -24,7 +24,7 @@ public class MeshokPageParser extends SeleniumAbstractPageParser {
     }
 
     @Override
-    public PageItemDescription getItemFromCard(Element card) {
+    public ItemDescription getItemFromCard(Element card) {
         Element cardImage = card.select(".m-item-card-image").first();
         if (cardImage != null) {
             Element itemTitleElement = card.select("div[class^=itemTitle]").first();
@@ -37,7 +37,7 @@ public class MeshokPageParser extends SeleniumAbstractPageParser {
             String caption = itemTitleElement.text();
             itemUrl = "http://meshok.net" + itemUrl;
 
-            return new PageItemDescription(id, itemUrl, photoUrl, caption);
+            return new ItemDescription(id, itemUrl, photoUrl, caption);
         }
         return null;
     }

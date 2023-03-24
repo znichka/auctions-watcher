@@ -5,7 +5,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import watcherbot.description.PageItemDescription;
+import watcherbot.description.ItemDescription;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
 public abstract class AbstractPageParser {
     protected abstract Elements getElementCardsList(Document doc);
 
-    protected abstract PageItemDescription getItemFromCard(Element card);
+    protected abstract ItemDescription getItemFromCard(Element card);
 
     public abstract String getDomainName();
 
@@ -28,14 +28,14 @@ public abstract class AbstractPageParser {
                 .get();
     }
 
-    public synchronized final List<PageItemDescription> getAllItems(String url) {
-        List<PageItemDescription> items = new ArrayList<>();
+    public synchronized final List<ItemDescription> getAllItems(String url) {
+        List<ItemDescription> items = new ArrayList<>();
         try {
             Document doc = getDocument(url);
             Elements cards = getElementCardsList(doc);
             for (Element card : cards){
                 try {
-                    PageItemDescription item = getItemFromCard(card);
+                    ItemDescription item = getItemFromCard(card);
                     if (item != null) items.add(item);
                 } catch (Exception e) {
                     log.warning("Error while parsing an item on a page, skipping. Url: "+ url);
