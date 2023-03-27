@@ -12,13 +12,13 @@ import watcherbot.bot.TelegramBotSender;
 import watcherbot.description.ItemDescription;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
@@ -53,11 +53,17 @@ public class PageWatchersManager  {
         registeredPageWatchers = new ArrayList<>();
     }
 
+    public List<ItemDescription> deleteAlreadySentItems(List<ItemDescription> items){
+        return items.stream().filter(item -> !sentItemsIds.contains(item.getId()))
+                      .filter(item -> item.getPhotoHash() == null || !sentItemsHashes.contains(item.getPhotoHash()))
+                      .collect(Collectors.toList());
+    }
+
     public void registerPageWatcher(PageWatcher pageWatcher){
         Runnable runnable = () -> {
             try {
                 log.info(String.format("Run for a page - %s", pageWatcher.getDescription()));
-                List<ItemDescription> newItems = pageWatcher.getNewItems();
+                List<ItemDescription> newItems = deleteAlreadySentItems(pageWatcher.getNewItems());
                 if (newItems.size() != 0) {
                     log.info(String.format("New items for %s page for %s bot", pageWatcher.getDescription(), getName()));
                     send(newItems);
@@ -77,16 +83,12 @@ public class PageWatchersManager  {
     public synchronized void send(List<ItemDescription> items) {
         log.info("Update for the " + name + " bot");
         for(ItemDescription item : items) {
-            if (sentItemsIds.add(item.getId())) {
-                try  {
-                    if (sentItemsHashes.add(item.getPhotoHash()))
-                        sender.sendItemDescription(credentials, item);
-
-                    //todo algorithm exception to image description
-                } catch (IOException | NoSuchAlgorithmException e) {
-                    log.severe(String.format("Error while sending item details to telegram bot %s. Item photo url: %s, item url: %s", name, item.getPhotoUrl(), item.getItemUrl()));
-                }
-//                sentItemsIds.add(item.getId());
+            try  {
+                sender.sendItemDescription(credentials, item);
+                sentItemsIds.add(item.getId());
+                sentItemsHashes.add(item.getPhotoHash());
+            } catch (IOException e) {
+                log.severe(String.format("Error while sending item details to telegram bot %s. Item photo url: %s, item url: %s", name, item.getPhotoUrl(), item.getItemUrl()));
             }
         }
     }

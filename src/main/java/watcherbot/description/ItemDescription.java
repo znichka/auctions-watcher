@@ -1,9 +1,11 @@
 package watcherbot.description;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.java.Log;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,13 +19,16 @@ import java.security.NoSuchAlgorithmException;
 //@AllArgsConstructor
 @Getter
 @NoArgsConstructor
+@Log
 public class ItemDescription {
     String id;
     String itemUrl;
     @Setter
     String photoUrl;
     String caption;
+    @JsonIgnore
     byte[] photoContents;
+    @JsonIgnore
     String photoHash;
 
     public ItemDescription(String id, String itemUrl, String photoUrl, String caption) {
@@ -45,13 +50,17 @@ public class ItemDescription {
         return photoContents;
     }
 
-    public String getPhotoHash() throws NoSuchAlgorithmException, IOException {
+    public String getPhotoHash() {
         if (photoHash == null) {
             InputStream is = new ByteArrayInputStream(getPhotoContents());
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            DigestInputStream dis = new DigestInputStream(is, md);
-            dis.readAllBytes();
-            photoHash = new String(md.digest());
+            try {
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                DigestInputStream dis = new DigestInputStream(is, md);
+                dis.readAllBytes();
+                photoHash = new String(md.digest());
+            } catch (NoSuchAlgorithmException | IOException e) {
+                log.severe("Error while getting photo hash for item " + itemUrl);
+            }
         }
         return photoHash;
     }

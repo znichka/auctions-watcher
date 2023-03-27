@@ -52,7 +52,7 @@ public class TelegramBotSender {
     }
 
     public synchronized void sendImageUpload(TelegramBotCredentials credentials, String photoUrl, String photoCaption, String itemUrl) throws IOException {
-        byte[] content = null;//getImageContent(photoUrl);
+        byte[] content = null;//getImageContent(photoUrl); todo
         if (content != null) sendImageUpload(credentials, content, photoCaption, itemUrl);
         else {
             sendMessage(credentials, photoUrl);
@@ -86,8 +86,5 @@ public class TelegramBotSender {
 
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
         restTemplate.postForEntity(requestUrl, request , String.class);
-
     }
-
-
 }

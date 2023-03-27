@@ -38,14 +38,9 @@ public class PageWatcher {
         this.period = pageDescription.getPeriod();
         this.url = pageDescription.getUrl();
         this.notify = pageDescription.getNotify();
-
         this.parser = parser;
-//        this.manager = manager;
-
-//        manager.registerPageWatcher(this);
         oldItems = new HashSet<>();
         getNewItems();
-//        manager.send("Page watcher for "+pageDescription.getDescription() + "has been added");
     }
 
     public List<ItemDescription> getNewItems() {
@@ -61,19 +56,4 @@ public class PageWatcher {
             return new ArrayList<>();
         }
     }
-
-//    @SneakyThrows
-//    public void run() {
-//        try {
-//            log.info(String.format("Run for a page - %s", pageDescription.getDescription()));
-//            List<PageItemDescription> newItems = getNewItems();
-//            if (newItems.size() != 0) {
-//                log.info(String.format("New items for %s page for %s bot", pageDescription.getDescription(), manager.getName()));
-//                manager.send(newItems);
-//            }
-//        } catch (Exception e) {
-//            log.severe(String.format("Error while parsing the page. Url: %s", pageDescription.getDescription()));
-//            log.severe(e.getMessage());
-//        }
-//    }
 }
