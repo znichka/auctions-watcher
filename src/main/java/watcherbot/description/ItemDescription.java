@@ -38,7 +38,7 @@ public class ItemDescription {
         this.caption = caption;
     }
 
-    public byte[] getPhotoContents(){
+    public byte[] getPhotoContents() {
         if (photoContents == null) {
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<byte[]> response

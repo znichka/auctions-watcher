@@ -7,14 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import watcherbot.bot.TelegramBotCredentials;
-import watcherbot.config.PageWatcherTestConfig;
 import watcherbot.config.PageWatchersManagerTestConfig;
 import watcherbot.description.ItemDescription;
 import watcherbot.parser.page.EbayPageParser;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {PageWatchersManagerTestConfig.class})

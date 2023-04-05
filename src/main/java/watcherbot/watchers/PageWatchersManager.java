@@ -53,13 +53,20 @@ public class PageWatchersManager  {
         registeredPageWatchers = new ArrayList<>();
     }
 
-    public List<ItemDescription> deleteAlreadySentItems(List<ItemDescription> items){
-        return items.stream().filter(item -> !sentItemsIds.contains(item.getId()))
+    public synchronized List<ItemDescription> deleteAlreadySentItems(List<ItemDescription> items){
+        return items.stream().filter(item ->  !sentItemsIds.contains(item.getId()))
                       .filter(item -> item.getPhotoHash() == null || !sentItemsHashes.contains(item.getPhotoHash()))
                       .collect(Collectors.toList());
     }
 
-    public void registerPageWatcher(PageWatcher pageWatcher){
+    private synchronized void loadHistory(PageWatcher pageWatcher) {
+        pageWatcher.getNewItems().forEach(item -> {
+            sentItemsIds.add(item.getId());
+            sentItemsHashes.add(item.getPhotoHash());
+            });
+    }
+
+    public synchronized void registerPageWatcher(PageWatcher pageWatcher){
         Runnable runnable = () -> {
             try {
                 log.info(String.format("Run for a page - %s", pageWatcher.getDescription()));
@@ -73,7 +80,9 @@ public class PageWatchersManager  {
                 log.severe(e.getMessage());
             }
         };
-        scheduledExecutorService.scheduleAtFixedRate(runnable, pageWatcher.getPeriod(), pageWatcher.getPeriod(), MINUTES);
+
+        loadHistory(pageWatcher);
+        scheduledExecutorService.scheduleAtFixedRate(runnable, 0, pageWatcher.getPeriod(), MINUTES);
 
         registeredPageWatchers.add(pageWatcher);
         send("Page watcher for " + pageWatcher.getDescription() + " has been added");
@@ -93,7 +102,7 @@ public class PageWatchersManager  {
         }
     }
 
-    public void send(String message) {
+    public synchronized void send(String message) {
         try {
             sender.sendMessage(credentials, message);
         } catch (IOException e) {
