@@ -79,7 +79,12 @@ public class TelegramBotSender {
         imageHeaders.setContentType(MediaType.IMAGE_PNG);
 
         HttpEntity<ByteArrayResource> imageAttachment;
-        ByteArrayResource fileAsResource = new ByteArrayResource(photoContent);
+        ByteArrayResource fileAsResource = new ByteArrayResource(photoContent){
+            @Override
+            public String getFilename(){
+                return "filename";
+            }
+        };
         imageAttachment = new HttpEntity<>(fileAsResource, imageHeaders);
 
         map.add("photo", imageAttachment);
