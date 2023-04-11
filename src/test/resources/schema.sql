@@ -1,0 +1,18 @@
+CREATE SCHEMA IF NOT EXISTS bots_schema;
+
+USE bots_schema;
+
+CREATE TABLE IF NOT EXISTS managers (
+  id INT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  token VARCHAR(255) NOT NULL,
+  chatId VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pages (
+  id INT PRIMARY KEY,
+  url VARCHAR(255) NOT NULL,
+  description VARCHAR(255) NOT NULL,
+  period INT NOT NULL,
+  notify INT
+);

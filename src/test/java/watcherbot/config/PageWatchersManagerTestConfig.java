@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import watcherbot.bot.TelegramBotCredentials;
+import watcherbot.description.ManagerDescription;
+import watcherbot.description.TelegramBotCredentials;
 import watcherbot.bot.TelegramBotSender;
 import watcherbot.watchers.PageWatchersManager;
 
@@ -28,7 +29,7 @@ public class PageWatchersManagerTestConfig {
         return Mockito.mock(ScheduledExecutorService.class);
     }
 
-    public PageWatchersManager getPageWatcherManager(TelegramBotCredentials credentials, String name){
-        return pageWatchersManagerProvider.getObject(credentials, name);
+    public PageWatchersManager getPageWatcherManager(ManagerDescription description){
+        return pageWatchersManagerProvider.getObject(description);
     }
 }

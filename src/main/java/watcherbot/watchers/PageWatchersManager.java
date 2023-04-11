@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import watcherbot.bot.TelegramBotCredentials;
+import watcherbot.description.ManagerDescription;
 import watcherbot.bot.TelegramBotSender;
 import watcherbot.description.ItemDescription;
 
@@ -23,30 +23,27 @@ import java.util.stream.Collectors;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 @Log
-@Component
 @Scope("prototype")
+@Component
 public class PageWatchersManager  {
-    @Autowired
-    private TelegramBotSender sender;
-    @Autowired
-    private ScheduledExecutorService scheduledExecutorService;
+    @Getter
+    final ManagerDescription description;
 
-    private final TelegramBotCredentials credentials;
-    private final List<PageWatcher> registeredPageWatchers;
-
-//    @Value("${healthcheck.fixedRate.in.milliseconds}")
-    int healthCheckFixedRate;
+    @Autowired
+    TelegramBotSender sender;
+    @Autowired
+    ScheduledExecutorService scheduledExecutorService;
 
     @Getter
-    private final String name;
+    final List<PageWatcher> registeredPageWatchers;
+
+    int healthCheckFixedRate;
 
     private final HashSet<String> sentItemsIds;
     private final HashSet<String> sentItemsHashes;
-//    private final HashSet<String> sentItems;
 
-    public PageWatchersManager(TelegramBotCredentials credentials, String name) {
-        this.credentials = credentials;
-        this.name = name;
+    public PageWatchersManager(ManagerDescription description) {
+        this.description = description;
 
         sentItemsIds = new HashSet<>();
         sentItemsHashes = new HashSet<>();
@@ -72,7 +69,7 @@ public class PageWatchersManager  {
                 log.info(String.format("Run for a page - %s", pageWatcher.getDescription()));
                 List<ItemDescription> newItems = deleteAlreadySentItems(pageWatcher.getNewItems());
                 if (newItems.size() != 0) {
-                    log.info(String.format("New items for %s page for %s bot", pageWatcher.getDescription(), getName()));
+                    log.info(String.format("New items for %s page for %s bot", pageWatcher.getDescription(), description.getName()));
                     send(newItems);
                 }
             } catch (Exception e) {
@@ -82,7 +79,7 @@ public class PageWatchersManager  {
         };
 
         loadHistory(pageWatcher);
-        scheduledExecutorService.scheduleAtFixedRate(runnable, 0, pageWatcher.getPeriod(), MINUTES);
+        scheduledExecutorService.scheduleAtFixedRate(runnable, 0, pageWatcher.getDescription().getPeriod(), MINUTES);
 
         registeredPageWatchers.add(pageWatcher);
         send("Page watcher for " + pageWatcher.getDescription() + " has been added");
@@ -90,53 +87,53 @@ public class PageWatchersManager  {
     }
 
     public synchronized void send(List<ItemDescription> items) {
-        log.info("Update for the " + name + " bot");
+        log.info("Update for the " + description.getName() + " bot");
         for(ItemDescription item : items) {
             try  {
-                sender.sendItemDescription(credentials, item);
+                sender.sendItemDescription(description.getCredentials(), item);
                 sentItemsIds.add(item.getId());
                 sentItemsHashes.add(item.getPhotoHash());
             } catch (IOException e) {
-                log.severe(String.format("Error while sending item details to telegram bot %s. Item photo url: %s, item url: %s", name, item.getPhotoUrl(), item.getItemUrl()));
+                log.severe(String.format("Error while sending item details to telegram bot %s. Item photo url: %s, item url: %s", description.getName(), item.getPhotoUrl(), item.getItemUrl()));
             }
         }
     }
 
     public synchronized void send(String message) {
         try {
-            sender.sendMessage(credentials, message);
+            sender.sendMessage(description.getCredentials(), message);
         } catch (IOException e) {
-            log.severe(String.format("Error while sending message to telegram bot %s. Message: %s", name, message));
+            log.severe(String.format("Error while sending message to telegram bot %s. Message: %s", description.getName(), message));
         }
     }
 
     @Scheduled(fixedRateString = "${healthcheck.fixedRate.in.milliseconds}")
     public void run() {
-        log.info(String.format("Performing healthcheck for %s bot", name));
+        log.info(String.format("Performing healthcheck for %s bot", description.getName()));
 
 //        int healthCheckRate = healthCheckFixedRate/60000;
 
         for (PageWatcher pageWatcher : registeredPageWatchers) {
             try {
                 long timeout = ChronoUnit.MINUTES.between(pageWatcher.getTimestamp(), LocalDateTime.now());
-                long notifyHours = pageWatcher.getNotify();
+                long notifyHours = pageWatcher.getDescription().getNotify();
 
                 if (timeout >= (notifyHours * 60)) {
                     timeout %= (notifyHours * 60);
                     if (timeout <= healthCheckFixedRate) {
                         String message = String.format("There were no updates for %s for last %d hours",
-                                pageWatcher.getDescription(),
-                                pageWatcher.getNotify());
+                                pageWatcher.getDescription().getDescription(),
+                                pageWatcher.getDescription().getNotify());
                         send(message);
                         log.info(message);
                     }
                 }
             } catch (Exception e) {
-                log.warning("Error while running a health check for " + name);
+                log.warning("Error while running a health check for " + description.getName());
                 log.warning(e.getMessage());
             }
         }
-        log.info(String.format("Healthcheck finished for %s bot", name));
+        log.info(String.format("Healthcheck finished for %s bot", description.getName()));
     }
 
     void setHealthCheckFixedRate(@Value("${healthcheck.fixedRate.in.milliseconds}") int fixedRate){

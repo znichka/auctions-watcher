@@ -2,19 +2,14 @@ package watcherbot.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import watcherbot.bot.TelegramBotCredentials;
 import watcherbot.description.ConfigDescription;
-import watcherbot.description.PageDescription;
-import watcherbot.description.PageWatchersManagerDescription;
-import watcherbot.parser.PageParserFactory;
-import watcherbot.watchers.PageWatcher;
-import watcherbot.watchers.PageWatchersManager;
+import watcherbot.description.ManagerDescription;
+import watcherbot.service.PageWatcherService;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,11 +26,7 @@ public class PageWatcherManagersConfig {
     private final static String CONFIG_JSON = "CONFIG_JSON";
 
     @Autowired
-    private  PageParserFactory availableParsers;
-    @Autowired
-    private ObjectProvider<PageWatcher> pageWatcherProvider;
-    @Autowired
-    private ObjectProvider<PageWatchersManager> pageWatchersManagerProvider;
+    private PageWatcherService repository;
 
     @Bean("configDescription")
     @Profile({"local", "remotechrome"})
@@ -63,18 +54,11 @@ public class PageWatcherManagersConfig {
 
     @Autowired
     public void configurePageWatchers(ConfigDescription config) {
-        for (PageWatchersManagerDescription pageWatchersManagerDescription : config.getWatchers()) {
-
-            TelegramBotCredentials credentials = new TelegramBotCredentials(pageWatchersManagerDescription.getToken(), config.getUserId());
-            PageWatchersManager manager = pageWatchersManagerProvider.getObject(credentials, pageWatchersManagerDescription.getName());
-
-            for (PageDescription pageDescription : pageWatchersManagerDescription.getPages()) {
-                try {
-                    PageWatcher watcher = pageWatcherProvider.getObject(availableParsers.getParserFor(pageDescription.getUrl()), pageDescription);
-                    manager.registerPageWatcher(watcher);
-                } catch (Exception e) {
-                    log.severe(e.getMessage());
-                }
+        for (ManagerDescription managerDescription : config.getWatchers()) {
+            try {
+                repository.add(managerDescription);
+            } catch (Exception e) {
+                log.severe(e.getMessage());
             }
         }
     }

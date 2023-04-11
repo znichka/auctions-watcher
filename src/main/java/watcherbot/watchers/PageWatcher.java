@@ -1,8 +1,12 @@
 package watcherbot.watchers;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.java.Log;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Component;
 import watcherbot.description.PageDescription;
 import watcherbot.description.ItemDescription;
@@ -18,13 +22,8 @@ import java.util.stream.Collectors;
 @Component
 @Scope("prototype")
 public class PageWatcher {
-    private final String url;
     @Getter
-    private final String description;
-    @Getter
-    private final Integer period;
-    @Getter
-    private final Long notify;
+    final PageDescription description;
 
     @Getter
 //    private final PageWatchersManager manager;
@@ -34,10 +33,8 @@ public class PageWatcher {
     private LocalDateTime timestamp;
 
     public PageWatcher(AbstractPageParser parser, PageDescription pageDescription/*, PageWatchersManager manager*/) {
-        this.description = pageDescription.getDescription();
-        this.period = pageDescription.getPeriod();
-        this.url = pageDescription.getUrl();
-        this.notify = pageDescription.getNotify();
+        this.description = pageDescription;
+
         this.parser = parser;
         oldItems = new HashSet<>();
         getNewItems();
@@ -45,7 +42,7 @@ public class PageWatcher {
 
     public List<ItemDescription> getNewItems() {
         try {
-            List<ItemDescription> items = parser.getAllItems(url).stream()
+            List<ItemDescription> items = parser.getAllItems(description.getUrl()).stream()
                     .filter(item -> oldItems.add(item.getId()))
                     .collect(Collectors.toList());
             if (items.size() != 0)

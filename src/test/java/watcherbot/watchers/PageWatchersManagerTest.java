@@ -6,7 +6,8 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import watcherbot.bot.TelegramBotCredentials;
+import watcherbot.description.ManagerDescription;
+import watcherbot.description.TelegramBotCredentials;
 import watcherbot.config.PageWatchersManagerTestConfig;
 import watcherbot.description.ItemDescription;
 import watcherbot.parser.page.EbayPageParser;
@@ -30,7 +31,7 @@ class PageWatchersManagerTest {
         EbayPageParser realPageParser = new EbayPageParser();
         List<ItemDescription> items = realPageParser.getAllItems(url1);
 
-        PageWatchersManager manager = config.getPageWatcherManager(Mockito.mock(TelegramBotCredentials.class), "test manager");
+        PageWatchersManager manager = config.getPageWatcherManager(Mockito.mock(ManagerDescription.class));
         manager.send(items);
         items = manager.deleteAlreadySentItems(items);
         assertEquals(0, items.size());

@@ -35,7 +35,7 @@ class ConfigDescriptionTest {
         Path path = Path.of("src/test/resources/test-watcher-bot-description.json");
         File file = new File(path.toUri());
         assertTrue(file.exists());
-        PageWatchersManagerDescription description = new ObjectMapper().readValue(file, PageWatchersManagerDescription.class);
+        ManagerDescription description = new ObjectMapper().readValue(file, ManagerDescription.class);
         assertNotNull(description);
         assertThatJson(description).isEqualTo(Files.readString(path));
     }

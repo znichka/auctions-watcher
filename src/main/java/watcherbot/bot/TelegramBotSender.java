@@ -10,6 +10,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import watcherbot.description.ItemDescription;
+import watcherbot.description.TelegramBotCredentials;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -49,15 +50,6 @@ public class TelegramBotSender {
 
     public synchronized void sendItemDescription(TelegramBotCredentials credentials, ItemDescription item) throws IOException {
         sendImageUpload(credentials, item.getPhotoContents(), item.getCaption(), item.getItemUrl());
-    }
-
-    public synchronized void sendImageUpload(TelegramBotCredentials credentials, String photoUrl, String photoCaption, String itemUrl) throws IOException {
-        byte[] content = null;//getImageContent(photoUrl); todo
-        if (content != null) sendImageUpload(credentials, content, photoCaption, itemUrl);
-        else {
-            sendMessage(credentials, photoUrl);
-            sendMessage(credentials, photoCaption);
-        }
     }
 
     public synchronized void sendImageUpload(TelegramBotCredentials credentials, byte[] photoContent, String photoCaption, String itemUrl) throws IOException {
