@@ -1,8 +1,10 @@
 package watcherbot.service;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import watcherbot.description.ManagerDescription;
 import watcherbot.description.PageDescription;
 import watcherbot.exception.ManagerNotFoundException;
@@ -12,16 +14,14 @@ import watcherbot.repository.PageWatchersManagerRepository;
 import watcherbot.watchers.PageWatcher;
 import watcherbot.watchers.PageWatchersManager;
 
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
+@Transactional
 public class PageWatcherService {
-    Map<Integer, PageWatchersManager> managerList = new HashMap<>();;
+    Map<Integer, PageWatchersManager> workerList = new HashMap<>();;
 
-    @Autowired
+    @Autowired //todo delete
     PageWatcherRepository pageWatcherRepository;
     @Autowired
     PageWatchersManagerRepository pageWatchersManagerRepository;
@@ -33,41 +33,53 @@ public class PageWatcherService {
     @Autowired
     ObjectProvider<PageWatchersManager> pageWatchersManagerProvider;
 
-    public List<PageWatcher> getPages(int managerId) {
-        return getManager(managerId).getRegisteredPageWatchers();
+    public PageDescription addPage(PageDescription pageDescription, int managerId) {
+        getManagerDescription(managerId).addPage(pageDescription);
+        loadPageWatcher(pageDescription, managerId);
+        return pageDescription;
     }
 
-    public PageWatcher add(PageDescription pageDescription, int managerId) {
-        pageWatcherRepository.save(pageDescription);
-        PageWatcher pageWatcher = pageWatcherProvider.getObject(availableParsers.getParserFor(pageDescription.getUrl()), pageDescription);
-        getManager(managerId).registerPageWatcher(pageWatcher);
-        return pageWatcher;
-    }
-
-    public PageWatchersManager add(ManagerDescription managerDescription) {
+    public ManagerDescription addManager(ManagerDescription managerDescription) {
         pageWatchersManagerRepository.save(managerDescription);
-        return loadPageWatchersManager(managerDescription);
+        loadPageWatchersManager(managerDescription);
+        return managerDescription;
     }
 
-    public List<PageWatchersManager> getAllManagers() {
-        return managerList.values().stream().toList();
+
+    public List<PageDescription> getAllPages(int managerId) {
+        return getManagerDescription(managerId).getPages().stream().toList();
     }
 
-    public PageWatchersManager getManager(int managerId) {
-        if (!managerList.containsKey(managerId)) throw new ManagerNotFoundException();
-        return managerList.get(managerId);
+    public List<ManagerDescription> getAllManagers() {
+        return pageWatchersManagerRepository.findAll();
+    }
+
+    public ManagerDescription getManagerDescription(int managerId) {
+        Optional<ManagerDescription> result = pageWatchersManagerRepository.findById(managerId);
+        if (result.isEmpty()) throw new ManagerNotFoundException();
+        return result.get();
     }
 
     @PostConstruct
     public void loadAllPageWatchersManagers() {
-        for (ManagerDescription managerDescription : pageWatchersManagerRepository.findAll())
+        for (ManagerDescription managerDescription : pageWatchersManagerRepository.findAll()) {
             loadPageWatchersManager(managerDescription);
+        }
     }
 
-    public PageWatchersManager loadPageWatchersManager(ManagerDescription managerDescription) {
+    private void loadPageWatchersManager(ManagerDescription managerDescription) {
         PageWatchersManager manager = pageWatchersManagerProvider.getObject(managerDescription);
-        managerList.put(manager.getDescription().getId(), manager);
-        managerDescription.getPages().forEach(p -> add(p, manager.getDescription().getId()));
-        return manager;
+        workerList.put(manager.getId(), manager);
+        managerDescription.getPages().forEach(p -> loadPageWatcher(p, managerDescription.getId()));
+    }
+
+    private void loadPageWatcher(PageDescription pageDescription, int managerId) {
+        PageWatcher pageWatcher = pageWatcherProvider.getObject(availableParsers.getParserFor(pageDescription.getUrl()), pageDescription);
+        getPageWatchersManager(managerId).registerPageWatcher(pageWatcher);
+    }
+
+    private PageWatchersManager getPageWatchersManager(int managerId) {
+        if (!workerList.containsKey(managerId)) throw new ManagerNotFoundException();
+        return workerList.get(managerId);
     }
 }

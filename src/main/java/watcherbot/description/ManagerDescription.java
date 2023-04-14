@@ -5,8 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor
 @Getter
@@ -25,7 +26,7 @@ public class ManagerDescription {
     String name;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    List<PageDescription> pages = new ArrayList<>();
+    Set<PageDescription> pages = new HashSet<>();
 
 
     public ManagerDescription setCredentials(TelegramBotCredentials credentials) {
@@ -39,13 +40,11 @@ public class ManagerDescription {
     }
 
     public ManagerDescription addPages(List<PageDescription> pages) {
-        if (this.pages == null) this.pages = new ArrayList<>();
         this.pages.addAll(pages);
         return this;
     }
 
     public ManagerDescription addPage(PageDescription page) {
-        if (this.pages == null) this.pages = new ArrayList<>();
         this.pages.add(page);
         return this;
     }

@@ -5,8 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import watcherbot.description.PageDescription;
 import watcherbot.description.ManagerDescription;
 import watcherbot.service.PageWatcherService;
-import watcherbot.watchers.PageWatcher;
-import watcherbot.watchers.PageWatchersManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,32 +23,32 @@ public class ConfigurationController {
     @GetMapping("/bots")
     @ResponseBody
     List<ManagerDescription> getAllManagers() {
-        return service.getAllManagers().stream().map(PageWatchersManager::getDescription).toList();
+        return service.getAllManagers();
     }
 
     @PostMapping("/bots")
     @ResponseBody
     ManagerDescription addManager(@RequestBody ManagerDescription managerDescription) {
-        return service.add(managerDescription).getDescription();
+        return service.addManager(managerDescription);//.getDescription();
     }
 
     @GetMapping("/bots/{id}/pages")
     @ResponseBody
     List<PageDescription> getAllPages(@PathVariable int id) {
-        List<PageWatcher> list = service.getPages(id);
+        List<PageDescription> list = service.getAllPages(id);
         if (list.size() == 0) return new ArrayList<>();
-        return list.stream().map(PageWatcher::getDescription).toList();
+        return list;
     }
 
     @GetMapping("/bots/{id}")
     @ResponseBody
     ManagerDescription getManager(@PathVariable int id) {
-        return service.getManager(id).getDescription();
+        return service.getManagerDescription(id);
     }
 
     @PostMapping("/bots/{id}/pages")
     @ResponseBody
     PageDescription addPage(@PathVariable("id") int id, @RequestBody PageDescription pageDescription) {
-        return service.add(pageDescription, id).getDescription();
+        return service.addPage(pageDescription, id);
     }
 }

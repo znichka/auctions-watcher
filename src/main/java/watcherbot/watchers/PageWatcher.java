@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @Component
 @Scope("prototype")
 public class PageWatcher {
-    @Getter
     final PageDescription description;
 
     @Getter
@@ -52,5 +51,17 @@ public class PageWatcher {
             log.warning(String.format("Error while getting new items for a page. Page info: %s", description));
             return new ArrayList<>();
         }
+    }
+
+    public String getDescription() {
+        return description.getDescription();
+    }
+
+    public Long getNotify() {
+        return description.getNotify();
+    }
+
+    public Integer getPeriod() {
+        return description.getPeriod();
     }
 }

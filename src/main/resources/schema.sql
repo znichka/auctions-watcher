@@ -20,4 +20,13 @@ CREATE TABLE IF NOT EXISTS pages (
 CREATE TABLE IF NOT EXISTS managers_pages (
    manager_description_id INT,
    pages_id INT
+   FOREIGN KEY (manager_description_id) REFERENCES managers(id),
+   FOREIGN KEY (pages_id) REFERENCES pages(id)
+);
+
+CREATE TABLE IF NOT EXISTS items (
+   item_id VARCHAR(255) NOT NULL,
+   manager_id INT NOT NULL,
+   image_hash VARCHAR(255) NOT NULL,
+   PRIMARY KEY (item_id, image_hash, manager_id)
 );

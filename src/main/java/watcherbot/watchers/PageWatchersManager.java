@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import watcherbot.description.ManagerDescription;
 import watcherbot.bot.TelegramBotSender;
 import watcherbot.description.ItemDescription;
+import watcherbot.service.ItemsService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
@@ -26,42 +26,50 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 @Scope("prototype")
 @Component
 public class PageWatchersManager  {
-    @Getter
+
     final ManagerDescription description;
 
     @Autowired
     TelegramBotSender sender;
     @Autowired
     ScheduledExecutorService scheduledExecutorService;
+    @Autowired
+    ItemsService itemsService;
 
     @Getter
     final List<PageWatcher> registeredPageWatchers;
 
     int healthCheckFixedRate;
 
-    private final HashSet<String> sentItemsIds;
-    private final HashSet<String> sentItemsHashes;
+//    private final HashSet<String> sentItemsIds;
+//    private final HashSet<String> sentItemsHashes;
 
     public PageWatchersManager(ManagerDescription description) {
+        System.out.println("description adress in constructor" + description);
         this.description = description;
 
-        sentItemsIds = new HashSet<>();
-        sentItemsHashes = new HashSet<>();
+//        sentItemsIds = new HashSet<>();
+//        sentItemsHashes = new HashSet<>();
         registeredPageWatchers = new ArrayList<>();
     }
 
     public synchronized List<ItemDescription> deleteAlreadySentItems(List<ItemDescription> items){
-        return items.stream().filter(item ->  !sentItemsIds.contains(item.getId()))
-                      .filter(item -> item.getPhotoHash() == null || !sentItemsHashes.contains(item.getPhotoHash()))
+        return items.stream().filter(item ->  itemsService.register(item.getId(), item.getPhotoHash(), description.getId()))
+//                      .filter(item -> item.getPhotoHash() == null || !sentItemsHashes.contains(item.getPhotoHash()))
                       .collect(Collectors.toList());
     }
 
-    private synchronized void loadHistory(PageWatcher pageWatcher) {
-        pageWatcher.getNewItems().forEach(item -> {
-            sentItemsIds.add(item.getId());
-            sentItemsHashes.add(item.getPhotoHash());
-            });
+    public synchronized List<ItemDescription> test(List<ItemDescription> items){
+        return items.stream().filter(item ->  !itemsService.register(item.getId(), item.getPhotoHash(), description.getId()))
+                .collect(Collectors.toList());
     }
+
+//    private synchronized void loadHistory(PageWatcher pageWatcher) {
+//        pageWatcher.getNewItems().forEach(item -> {
+//            sentItemsIds.add(item.getId());
+//            sentItemsHashes.add(item.getPhotoHash());
+//            });
+//    }
 
     public synchronized void registerPageWatcher(PageWatcher pageWatcher){
         Runnable runnable = () -> {
@@ -78,8 +86,7 @@ public class PageWatchersManager  {
             }
         };
 
-        loadHistory(pageWatcher);
-        scheduledExecutorService.scheduleAtFixedRate(runnable, 0, pageWatcher.getDescription().getPeriod(), MINUTES);
+        scheduledExecutorService.scheduleAtFixedRate(runnable, 0, pageWatcher.getPeriod(), MINUTES);
 
         registeredPageWatchers.add(pageWatcher);
         send("Page watcher for " + pageWatcher.getDescription() + " has been added");
@@ -91,8 +98,8 @@ public class PageWatchersManager  {
         for(ItemDescription item : items) {
             try  {
                 sender.sendItemDescription(description.getCredentials(), item);
-                sentItemsIds.add(item.getId());
-                sentItemsHashes.add(item.getPhotoHash());
+//                sentItemsIds.add(item.getId());
+//                sentItemsHashes.add(item.getPhotoHash());
             } catch (IOException e) {
                 log.severe(String.format("Error while sending item details to telegram bot %s. Item photo url: %s, item url: %s", description.getName(), item.getPhotoUrl(), item.getItemUrl()));
             }
@@ -107,6 +114,10 @@ public class PageWatchersManager  {
         }
     }
 
+    public int getId() {
+        return description.getId();
+    }
+
     @Scheduled(fixedRateString = "${healthcheck.fixedRate.in.milliseconds}")
     public void run() {
         log.info(String.format("Performing healthcheck for %s bot", description.getName()));
@@ -116,14 +127,14 @@ public class PageWatchersManager  {
         for (PageWatcher pageWatcher : registeredPageWatchers) {
             try {
                 long timeout = ChronoUnit.MINUTES.between(pageWatcher.getTimestamp(), LocalDateTime.now());
-                long notifyHours = pageWatcher.getDescription().getNotify();
+                long notifyHours = pageWatcher.getNotify();
 
                 if (timeout >= (notifyHours * 60)) {
                     timeout %= (notifyHours * 60);
                     if (timeout <= healthCheckFixedRate) {
                         String message = String.format("There were no updates for %s for last %d hours",
-                                pageWatcher.getDescription().getDescription(),
-                                pageWatcher.getDescription().getNotify());
+                                pageWatcher.getDescription(),
+                                pageWatcher.getNotify());
                         send(message);
                         log.info(message);
                     }

@@ -15,14 +15,16 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-@Getter
 @NoArgsConstructor
 @Log
 public class ItemDescription {
+    @Setter @Getter
     String id;
+    @Setter @Getter
     String itemUrl;
-    @Setter
+    @Setter @Getter
     String photoUrl;
+    @Setter @Getter
     String caption;
     @JsonIgnore
     byte[] photoContents;

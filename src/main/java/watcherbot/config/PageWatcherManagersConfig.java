@@ -52,14 +52,14 @@ public class PageWatcherManagersConfig {
         return Executors.newScheduledThreadPool(1);
     }
 
-    @Autowired
-    public void configurePageWatchers(ConfigDescription config) {
-        for (ManagerDescription managerDescription : config.getWatchers()) {
-            try {
-                repository.add(managerDescription);
-            } catch (Exception e) {
-                log.severe(e.getMessage());
-            }
-        }
-    }
+//    @Autowired
+//    public void configurePageWatchers(ConfigDescription config) {
+//        for (ManagerDescription managerDescription : config.getWatchers()) {
+//            try {
+//                repository.add(managerDescription);
+//            } catch (Exception e) {
+//                log.severe(e.getMessage());
+//            }
+//        }
+//    }
 }
