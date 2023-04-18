@@ -21,8 +21,6 @@ import java.util.*;
 public class PageWatcherService {
     Map<Integer, PageWatchersManager> workerList = new HashMap<>();;
 
-    @Autowired //todo delete
-    PageWatcherRepository pageWatcherRepository;
     @Autowired
     PageWatchersManagerRepository pageWatchersManagerRepository;
 

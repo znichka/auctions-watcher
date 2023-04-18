@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 @NoArgsConstructor
 @Log
@@ -42,8 +43,7 @@ public class ItemDescription {
         if (photoContents == null) {
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<byte[]> response
-                    = restTemplate.getForEntity(photoUrl, byte[].class);
-
+                    = restTemplate.getForEntity(photoUrl, byte[].class);//todo if photoUrl is null
             if (response.getStatusCode().is2xxSuccessful())
                 photoContents = response.getBody();
         }
@@ -57,7 +57,7 @@ public class ItemDescription {
                 MessageDigest md = MessageDigest.getInstance("MD5");
                 DigestInputStream dis = new DigestInputStream(is, md);
                 dis.readAllBytes();
-                photoHash = new String(md.digest());
+                photoHash = Base64.getEncoder().encodeToString(md.digest());
             } catch (NoSuchAlgorithmException | IOException e) {
                 log.severe("Error while getting photo hash for item " + itemUrl);
             }

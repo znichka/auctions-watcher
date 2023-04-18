@@ -20,9 +20,10 @@ class ItemsServiceTest {
         assertTrue(itemsService.register("1", "aaa", 1));
         assertFalse(itemsService.register("1", "aaa", 1));
 
+        assertTrue(itemsService.register("3", "aaa", 2));
+        assertFalse(itemsService.register("3", "aaa", 1));
+
         assertTrue(itemsService.register("2", "bbb", 1));
         assertTrue(itemsService.register("2", "bbb", 2));
-
-        assertTrue(itemsService.register("3", "aaa", 1));
     }
 }
