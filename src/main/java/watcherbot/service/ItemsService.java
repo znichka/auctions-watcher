@@ -3,6 +3,7 @@ package watcherbot.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+import watcherbot.description.ItemDescription;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,21 +14,22 @@ public class ItemsService {
     @Autowired
     NamedParameterJdbcTemplate jdbcTemplate;
 
-    List<String> getItemIdsByManagerId(int managerId) {
-        String sql = "SELECT item_id FROM items WHERE manager_id = :manager_id";
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("manager_id", managerId);
-        return jdbcTemplate.queryForList(sql, paramMap, String.class);
+    public boolean insertIfUnique(ItemDescription item, int managerId) {
+        return insertIfUnique(item.getId(), item.getPhotoHash(), item.getPhotoUrl(), managerId);
     }
 
-    public boolean register(String itemId, String imageHash, int managerId) {
-        String sql = "INSERT INTO items (item_id, image_hash, manager_id) " +
-                    "VALUES (:item_id, :image_hash, :manager_id) "
-                + "ON CONFLICT DO NOTHING";
+    public boolean insertIfUnique(String itemId, String imageHash, String url, int managerId) {
+        String sql = "INSERT INTO items (item_id, image_hash, manager_id, url) " +
+                "SELECT :item_id, :image_hash, :manager_id, :url " +
+                "WHERE NOT EXISTS (SELECT * FROM items WHERE manager_id = :manager_id and image_hash = :image_hash) " +
+                "ON CONFLICT DO NOTHING";
+
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("item_id", itemId);
         paramMap.put("image_hash", imageHash);
+        paramMap.put("url", url);
         paramMap.put("manager_id", managerId);
-        return jdbcTemplate.update(sql, paramMap) == 1;
+
+        return jdbcTemplate.update(sql, paramMap) == 1;//todo on error
     }
 }

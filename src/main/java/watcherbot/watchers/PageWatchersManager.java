@@ -49,7 +49,7 @@ public class PageWatchersManager  {
     }
 
     public synchronized List<ItemDescription> deleteAlreadySentItems(List<ItemDescription> items){
-        return items.stream().filter(item ->  itemsService.register(item.getId(), item.getPhotoHash(), description.getId()))
+        return items.stream().filter(item ->  itemsService.insertIfUnique(item, description.getId()))
                       .collect(Collectors.toList());
     }
 

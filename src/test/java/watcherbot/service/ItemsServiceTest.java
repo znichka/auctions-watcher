@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
+import watcherbot.description.ItemDescription;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,14 +17,12 @@ class ItemsServiceTest {
     ItemsService itemsService;
 
     @Test
-    void ifAdded() {
-        assertTrue(itemsService.register("1", "aaa", 1));
-        assertFalse(itemsService.register("1", "aaa", 1));
+    void insertIfUnique() {
+        assertTrue(itemsService.insertIfUnique("1", "aaa", "", 1));
+        assertTrue(itemsService.insertIfUnique("2", "bbb", "",  1));
 
-        assertTrue(itemsService.register("3", "aaa", 2));
-        assertFalse(itemsService.register("3", "aaa", 1));
-
-        assertTrue(itemsService.register("2", "bbb", 1));
-        assertTrue(itemsService.register("2", "bbb", 2));
+        assertFalse(itemsService.insertIfUnique("1", "aaa","",  1));
+        assertFalse(itemsService.insertIfUnique("1", "bbb","",  1));
+        assertFalse(itemsService.insertIfUnique("2", "aaa","",  1));
     }
 }

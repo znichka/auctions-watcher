@@ -27,5 +27,6 @@ CREATE TABLE IF NOT EXISTS items (
    manager_id INT NOT NULL,
    image_hash VARCHAR(64) NOT NULL,
    last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-   PRIMARY KEY (image_hash, manager_id)
+   url VARCHAR(500),
+   PRIMARY KEY (item_id, manager_id)
 );
