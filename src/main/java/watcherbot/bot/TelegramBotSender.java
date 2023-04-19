@@ -1,6 +1,7 @@
 package watcherbot.bot;
 
 import lombok.extern.java.Log;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +22,7 @@ import java.net.URLConnection;
 
 @Log
 @Component
+@Scope("prototype")
 public class TelegramBotSender {
     private void send(String response) throws MalformedURLException {
         URL url = new URL(response);
@@ -32,13 +34,13 @@ public class TelegramBotSender {
         }
     }
 
-    public synchronized void sendMessage(TelegramBotCredentials credentials, String message) throws IOException {
+    public void sendMessage(TelegramBotCredentials credentials, String message) throws IOException {
         String response = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s";
         response = String.format(response, credentials.getToken(), credentials.getChatId(), message);
         send(response);
     }
 
-    public synchronized void sendImage(TelegramBotCredentials credentials, String photoUrl, String photoCaption, String itemLink) throws IOException {
+    public void sendImage(TelegramBotCredentials credentials, String photoUrl, String photoCaption, String itemLink) throws IOException {
         String response = "https://api.telegram.org/bot%s/sendPhoto?chat_id=%s&photo=%s&caption=%s&parse_mode=HTML";
         String caption =  String.format("<a href=\"%s\">%s</a>", itemLink, photoCaption);
 
@@ -48,11 +50,11 @@ public class TelegramBotSender {
 
 
 
-    public synchronized void sendItemDescription(TelegramBotCredentials credentials, ItemDescription item) throws IOException {
+    public void sendItemDescription(TelegramBotCredentials credentials, ItemDescription item) throws IOException {
         sendImageUpload(credentials, item.getPhotoContents(), item.getCaption(), item.getItemUrl());
     }
 
-    public synchronized void sendImageUpload(TelegramBotCredentials credentials, byte[] photoContent, String photoCaption, String itemUrl) throws IOException {
+    public void sendImageUpload(TelegramBotCredentials credentials, byte[] photoContent, String photoCaption, String itemUrl) {
         String requestUrl = "https://api.telegram.org/bot%s/sendPhoto";
         String caption =  String.format("<a href=\"%s\">%s</a>", itemUrl, photoCaption);
 

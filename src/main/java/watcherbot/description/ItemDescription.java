@@ -40,10 +40,11 @@ public class ItemDescription {
     }
 
     public byte[] getPhotoContents() {
+        if (photoUrl == null) return null;
         if (photoContents == null) {
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<byte[]> response
-                    = restTemplate.getForEntity(photoUrl, byte[].class);//todo if photoUrl is null
+                    = restTemplate.getForEntity(photoUrl, byte[].class);
             if (response.getStatusCode().is2xxSuccessful())
                 photoContents = response.getBody();
         }
@@ -51,6 +52,7 @@ public class ItemDescription {
     }
 
     public String getPhotoHash() {
+        if (getPhotoContents() == null) return null;
         if (photoHash == null) {
             InputStream is = new ByteArrayInputStream(getPhotoContents());
             try {

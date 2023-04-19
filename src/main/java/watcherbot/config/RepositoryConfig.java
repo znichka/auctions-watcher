@@ -12,7 +12,6 @@ import watcherbot.service.PageWatcherService;
 import javax.sql.DataSource;
 
 @Configuration
-//@EnableTransactionManagement
 @EnableJpaRepositories({"watcherbot.repository"})
 public class RepositoryConfig {
     @Bean

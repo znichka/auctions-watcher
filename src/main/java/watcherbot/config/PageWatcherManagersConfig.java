@@ -14,6 +14,6 @@ import java.util.concurrent.ScheduledExecutorService;
 public class PageWatcherManagersConfig {
     @Bean
     public static ScheduledExecutorService getScheduledExecutorService() {
-        return Executors.newScheduledThreadPool(1);
+        return Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
     }
 }

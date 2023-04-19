@@ -32,7 +32,7 @@ public class MeshokPageParser extends SeleniumAbstractPageParser {
 
             String itemUrl = cardImage.attr("href");
             Element imgElement = cardImage.selectFirst("img");
-            String photoUrl = "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg";
+            String photoUrl = null;
             if (imgElement != null) photoUrl = imgElement.attr("src");
             String caption = itemTitleElement.text();
             itemUrl = "http://meshok.net" + itemUrl;

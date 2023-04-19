@@ -1,20 +1,15 @@
 package watcherbot.watchers;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import watcherbot.description.ManagerDescription;
-import watcherbot.description.TelegramBotCredentials;
 import watcherbot.config.PageWatchersManagerTestConfig;
 import watcherbot.description.ItemDescription;
 import watcherbot.parser.page.EbayPageParser;
-import watcherbot.service.ItemsService;
 
 import java.util.List;
 
@@ -38,13 +33,13 @@ class PageWatchersManagerTest {
 
         PageWatchersManager manager = config.getPageWatcherManager(Mockito.mock(ManagerDescription.class));
 //        manager.send(items);
-        items = manager.deleteAlreadySentItems(items);
+        items = manager.filterUniqueItems(items);
         assertTrue(items.size() > 0);
-        items = manager.deleteAlreadySentItems(items);
+        items = manager.filterUniqueItems(items);
         assertEquals(0, items.size());
 
         items = realPageParser.getAllItems(url2);
-        items = manager.deleteAlreadySentItems(items);
+        items = manager.filterUniqueItems(items);
         assertTrue(items.size() > 0);
 
         ItemDescription item1 = new ItemDescription();
@@ -58,9 +53,9 @@ class PageWatchersManagerTest {
         item3.setId("3");
 
         items = List.of(item1, item3);
-        manager.deleteAlreadySentItems(items);
+        manager.filterUniqueItems(items);
         items = List.of(item3);
-        items = manager.deleteAlreadySentItems(items);
+        items = manager.filterUniqueItems(items);
         assertEquals(0, items.size());
 
     }
