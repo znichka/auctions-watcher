@@ -1,7 +1,7 @@
 package watcherbot.parser.page;
 
 import org.springframework.stereotype.Component;
-import watcherbot.description.PageItemDescription;
+import watcherbot.description.ItemDescription;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -15,14 +15,14 @@ public class AyPageParser extends AbstractPageParser {
     }
 
     @Override
-    public PageItemDescription getItemFromCard(Element card) {
+    public ItemDescription getItemFromCard(Element card) {
         String id = card.attr("data-value");
 
         Element item = card.selectFirst("a.item-type-card__link");
         String itemUrl = item.attr("href");
         String photoUrl = item.selectFirst("img").attr("src");
         String caption = item.getElementsByClass("item-type-card__title").first().text();
-        return new PageItemDescription(id, itemUrl, photoUrl, caption);
+        return new ItemDescription(id, itemUrl, photoUrl, caption);
     }
 
     @Override

@@ -18,14 +18,13 @@ import java.util.concurrent.TimeUnit;
 
 @Log
 @Configuration
-@PropertySource("application.properties")
+@PropertySource("classpath:application.properties")
 @ComponentScan("watcherbot.driver")
 public class WebDriverConfig {
     @Bean(destroyMethod = "quit", name = "webDriver")
     @Scope("prototype")
     @Profile("local")
     public static AutoCloseableWebDriver getLocalWebDriver() {
-
         WebDriverManager.chromedriver().setup();
         return new AutoCloseableWebDriver(new ChromeDriver());
     }

@@ -4,7 +4,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
-import watcherbot.description.PageItemDescription;
+import watcherbot.description.ItemDescription;
 import watcherbot.parser.AbstractPageParser;
 
 @Component
@@ -16,7 +16,7 @@ public class AvitoPageParser extends AbstractPageParser {
     }
 
     @Override
-    public PageItemDescription getItemFromCard(Element card) {
+    public ItemDescription getItemFromCard(Element card) {
         String id = card.attr("data-item-id");
 
         Element linkElement = card.getElementsByClass("link-link-MbQDP").first();
@@ -30,7 +30,7 @@ public class AvitoPageParser extends AbstractPageParser {
         String imageUrl = imageElement.attr("data-marker");
         imageUrl = imageUrl.substring(19);
 
-        return new PageItemDescription(id, itemUrl, imageUrl, caption);
+        return new ItemDescription(id, itemUrl, imageUrl, caption);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package watcherbot.parser.page;
 
 import org.springframework.stereotype.Component;
-import watcherbot.description.PageItemDescription;
+import watcherbot.description.ItemDescription;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -15,7 +15,7 @@ public class EtsyPageParser extends AbstractPageParser {
     }
 
     @Override
-    public PageItemDescription getItemFromCard(Element card) {
+    public ItemDescription getItemFromCard(Element card) {
         String caption = card.attr("title");
         String itemUrl = card.attr("href");
         String id = card.attr("data-listing-id");
@@ -23,7 +23,7 @@ public class EtsyPageParser extends AbstractPageParser {
         Element imgElement = card.getElementsByTag("img").first();
         String photoUrl = imgElement.attr("src");
 
-        return new PageItemDescription(id, itemUrl, photoUrl, caption);
+        return new ItemDescription(id, itemUrl, photoUrl, caption);
     }
 
     @Override

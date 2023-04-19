@@ -1,5 +1,6 @@
 package watcherbot.driver;
 
+import lombok.extern.java.Log;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -7,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 import java.util.Set;
 
+@Log
 public class AutoCloseableWebDriver implements AutoCloseable, WebDriver {
     WebDriver webDriver;
 
@@ -46,7 +48,7 @@ public class AutoCloseableWebDriver implements AutoCloseable, WebDriver {
 
     @Override
     public void close() {
-        System.out.println("closing web driver");
+        log.info("Closing web driver");
         webDriver.quit();
     }
 

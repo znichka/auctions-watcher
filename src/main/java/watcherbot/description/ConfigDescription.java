@@ -10,6 +10,5 @@ import java.util.List;
 @Setter
 @Getter
 public class ConfigDescription {
-    private List<PageWatchersManagerDescription> watchers;
-    private String userId;
+    private List<ManagerDescription> watchers;
 }

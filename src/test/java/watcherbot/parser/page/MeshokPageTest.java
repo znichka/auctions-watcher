@@ -22,7 +22,7 @@ public class MeshokPageTest {
 
     @Test
     public void getAllItems() {
-        String url = "https://meshok.net/en?a=1&a_o=2&a_o=15&good=14299&pp=48&sort=beg_date&way=desc&reposted=N";
+        String url = "https://meshok.net/en/listing?a_o=15&city_id=32&good=14299&sort=beg_date&way=desc&reposted=N";
         assertTrue(meshokPageParser.getAllItems(url).size() > 0);
 
     }
@@ -34,7 +34,7 @@ public class MeshokPageTest {
     }
     @Test
     public void getNoItemsSearch() {
-        String url = "https://meshok.net/en/listing?a=1&a_o=2&a_o=15&good=109&search=елочная+игрушка&pp=48&sort=beg_date&way=desc&reposted=N";
+        String url = "https://meshok.net/en/listing?a=1&a_o=2&a_o=15&good=109&search=blablabla&pp=48&sort=beg_date&way=desc&reposted=N";
         assertEquals(0, meshokPageParser.getAllItems(url).size());
 
     }

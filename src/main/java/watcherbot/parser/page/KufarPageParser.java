@@ -1,7 +1,7 @@
 package watcherbot.parser.page;
 
 import org.springframework.stereotype.Component;
-import watcherbot.description.PageItemDescription;
+import watcherbot.description.ItemDescription;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -16,7 +16,7 @@ public class KufarPageParser extends AbstractPageParser {
     }
 
     @Override
-    public PageItemDescription getItemFromCard(Element card) {
+    public ItemDescription getItemFromCard(Element card) {
         String itemUrl = card.attr("href");
         String id = itemUrl.substring(itemUrl.length() - 9);
 
@@ -25,7 +25,7 @@ public class KufarPageParser extends AbstractPageParser {
         String photoUrl = imgElement == null ? "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg" : imgElement.attr("data-src");
         String caption = imgElement == null ? "Елочная игрушка": imgElement.attr("alt");
 
-        return new PageItemDescription(id, itemUrl, photoUrl, caption);
+        return new ItemDescription(id, itemUrl, photoUrl, caption);
     }
 
     @Override
