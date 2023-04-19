@@ -25,9 +25,8 @@ public class ManagerDescription {
     @Column
     String name;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     Set<PageDescription> pages = new HashSet<>();
-
 
     public ManagerDescription setCredentials(TelegramBotCredentials credentials) {
         this.credentials = credentials;
@@ -47,5 +46,13 @@ public class ManagerDescription {
     public ManagerDescription addPage(PageDescription page) {
         this.pages.add(page);
         return this;
+    }
+
+    public boolean removePage(PageDescription page) {
+        return pages.remove(page);
+    }
+
+    public List<PageDescription> getPages() {
+        return pages.stream().toList();
     }
 }

@@ -25,7 +25,6 @@ public class WebDriverConfig {
     @Scope("prototype")
     @Profile("local")
     public static AutoCloseableWebDriver getLocalWebDriver() {
-
         WebDriverManager.chromedriver().setup();
         return new AutoCloseableWebDriver(new ChromeDriver());
     }

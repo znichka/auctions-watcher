@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 
 @NoArgsConstructor
@@ -45,6 +44,5 @@ public class PageDescription {
     public PageDescription setNotify(Long notify) {
         this.notify = notify;
         return this;
-
     }
 }
