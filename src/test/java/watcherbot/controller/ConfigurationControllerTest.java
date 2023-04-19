@@ -2,47 +2,39 @@ package watcherbot.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import watcherbot.config.ConfigurationControllerTestConfig;
 import watcherbot.description.ManagerDescription;
 import watcherbot.description.PageDescription;
-import watcherbot.repository.PageWatcherRepository;
-import watcherbot.repository.PageWatchersManagerRepository;
-import watcherbot.service.PageWatcherService;
+import watcherbot.repository.ManagerDescriptionRepository;
+import watcherbot.repository.PageDescriptionRepository;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ContextConfiguration(classes = {ConfigurationControllerTestConfig.class})
 @WebMvcTest(ConfigurationController.class)
-//@DataJpaTest
-//@SpringBootTest
-//@AutoConfigureMockMvc
-////@AutoConfigureDataJpa
-//@AutoConfigureTestDatabase
 class ConfigurationControllerTest {
     @Autowired
     MockMvc mockMvc;
+    @Autowired
+    ManagerDescriptionRepository managerDescriptionRepository;
+    @Autowired
+    PageDescriptionRepository pageDescriptionRepository;
 
     @Test
     void addPage() throws Exception {
@@ -54,10 +46,13 @@ class ConfigurationControllerTest {
                 .andExpect(status().isOk()).andReturn();
 
         ManagerDescription managerDescription = new ObjectMapper().readValue(response.getResponse().getContentAsString(), ManagerDescription.class);
+        managerDescription.setId(1);
 
         path = Path.of("src/test/resources/test-page-description.json");
         file = new File(path.toUri());
         assertTrue(file.exists());
+
+        Mockito.when(managerDescriptionRepository.findById(1)).thenReturn(Optional.of(managerDescription));
 
         PageDescription pageDescription = new ObjectMapper().readValue(Files.readString(path), PageDescription.class);
 
@@ -83,6 +78,9 @@ class ConfigurationControllerTest {
         mockMvc.perform(post("/bots").contentType(MediaType.APPLICATION_JSON).content(Files.readString(path)))
                         .andExpect(status().isOk());
 
+        managerDescription.setId(1);
+        Mockito.when(managerDescriptionRepository.findAll()).thenReturn(List.of(managerDescription));
+
         mockMvc.perform(get("/bots"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -101,11 +99,12 @@ class ConfigurationControllerTest {
                 .andExpect(status().isOk()).andReturn();
 
         ManagerDescription managerDescription = new ObjectMapper().readValue(response.getResponse().getContentAsString(), ManagerDescription.class);
+        managerDescription.setId(1);
+        Mockito.when(managerDescriptionRepository.findById(1)).thenReturn(Optional.of(managerDescription));
 
         mockMvc.perform(get(String.format("/bots/%d/pages", managerDescription.getId())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].length()").value(managerDescription.getPages().size()));
-
+                .andExpect(jsonPath("$.length()").value(managerDescription.getPages().size()));
 
         mockMvc.perform(get("/bots/100/pages"))
                 .andExpect(status().isNotFound());
@@ -122,6 +121,8 @@ class ConfigurationControllerTest {
                 .andExpect(status().isOk()).andReturn();
 
         ManagerDescription managerDescription = new ObjectMapper().readValue(response.getResponse().getContentAsString(), ManagerDescription.class);
+        managerDescription.setId(1);
+        Mockito.when(managerDescriptionRepository.findById(1)).thenReturn(Optional.of(managerDescription));
 
         mockMvc.perform(get(String.format("/bots/%d/pages", managerDescription.getId())))
                 .andExpect(status().isOk())
@@ -130,7 +131,37 @@ class ConfigurationControllerTest {
     }
 
     @Test
+    void deletePage() throws Exception {
+        Path path = Path.of("src/test/resources/test-watcher-bot-description-with-pages.json");
+        File file = new File(path.toUri());
+        assertTrue(file.exists());
+
+        MvcResult response = mockMvc.perform(post("/bots").contentType(MediaType.APPLICATION_JSON).content(Files.readString(path)))
+                .andExpect(status().isOk()).andReturn();
+
+        ManagerDescription managerDescription = new ObjectMapper().readValue(response.getResponse().getContentAsString(), ManagerDescription.class);
+        Mockito.when(managerDescriptionRepository.findById(0)).thenReturn(Optional.of(managerDescription));
+
+        mockMvc.perform(get(String.format("/bots/%d/pages", managerDescription.getId())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(managerDescription.getPages().size()));
+
+        PageDescription pageDescription = managerDescription.getPages().get(0);
+        Mockito.when(pageDescriptionRepository.findById(any())).thenReturn(Optional.of(pageDescription));
+
+        mockMvc.perform(delete(String.format("/bots/%d/pages/%d", managerDescription.getId(), pageDescription.getId())))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(String.format("/bots/%d/pages", managerDescription.getId())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(managerDescription.getPages().size()));
+
+    }
+
+    @Test
     void healthcheck() throws Exception {
         mockMvc.perform(get("/health")).andExpect(status().isOk());
     }
+
+
 }

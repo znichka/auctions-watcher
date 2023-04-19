@@ -32,23 +32,29 @@ public class ConfigurationController {
         return service.addManager(managerDescription);//.getDescription();
     }
 
-    @GetMapping("/bots/{id}/pages")
+    @GetMapping("/bots/{manager_id}")
     @ResponseBody
-    List<PageDescription> getAllPages(@PathVariable int id) {
-        List<PageDescription> list = service.getAllPages(id);
+    ManagerDescription getManager(@PathVariable("manager_id") int managerId) {
+        return service.getManagerDescription(managerId);
+    }
+
+    @GetMapping("/bots/{manager_id}/pages")
+    @ResponseBody
+    List<PageDescription> getAllPages(@PathVariable("manager_id") int managerId) {
+        List<PageDescription> list = service.getAllPages(managerId);
         if (list.size() == 0) return new ArrayList<>();
         return list;
     }
 
-    @GetMapping("/bots/{id}")
+    @PostMapping("/bots/{manager_id}/pages")
     @ResponseBody
-    ManagerDescription getManager(@PathVariable int id) {
-        return service.getManagerDescription(id);
+    PageDescription addPage(@PathVariable("manager_id") int managerId, @RequestBody PageDescription pageDescription) {
+        return service.addPage(pageDescription, managerId);
     }
 
-    @PostMapping("/bots/{id}/pages")
+    @DeleteMapping("/bots/{manager_id}/pages/{page_id}")
     @ResponseBody
-    PageDescription addPage(@PathVariable("id") int id, @RequestBody PageDescription pageDescription) {
-        return service.addPage(pageDescription, id);
+    boolean deletePage(@PathVariable("manager_id") int managerId, @PathVariable("page_id") int pageId) {
+        return service.deletePage(managerId, pageId);
     }
 }

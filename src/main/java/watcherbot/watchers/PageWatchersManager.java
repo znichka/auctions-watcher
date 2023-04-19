@@ -8,12 +8,15 @@ import org.springframework.stereotype.Component;
 import watcherbot.bot.TelegramBotSender;
 import watcherbot.description.ItemDescription;
 import watcherbot.description.ManagerDescription;
+import watcherbot.description.PageDescription;
 import watcherbot.service.ItemsService;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -33,13 +36,14 @@ public class PageWatchersManager  {
     @Autowired
     ItemsService itemsService;
 
-    final List<PageWatcher> registeredPageWatchers;
+    final Map<Integer, PageWatcher> registeredPageWatchers;
+    final Map<Integer, ScheduledFuture<?>> registeredScheduledTasks;
 
     public PageWatchersManager(ManagerDescription description) {
-        System.out.println("description adress in constructor" + description);
         this.description = description;
 
-        registeredPageWatchers = new ArrayList<>();
+        registeredPageWatchers = new HashMap<>();
+        registeredScheduledTasks = new HashMap<>();
     }
 
     public synchronized List<ItemDescription> filterUniqueItems(List<ItemDescription> items){
@@ -66,11 +70,24 @@ public class PageWatchersManager  {
             }
         };
         synchronized (this) {
-            scheduledExecutorService.scheduleAtFixedRate(runnable, 0, pageWatcher.getPeriod(), MINUTES);
-            registeredPageWatchers.add(pageWatcher);
+            ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(runnable, 0, pageWatcher.getPeriod(), MINUTES);
+            registeredScheduledTasks.put(pageWatcher.description.getId(), future);
+            registeredPageWatchers.put(pageWatcher.description.getId(), pageWatcher);
         }
         send("Page watcher for " + pageWatcher.getDescription() + " has been added");
+    }
 
+    public boolean removePageWatcher(PageDescription pageDescription) {
+        int pageId = pageDescription.getId();
+        if (!registeredScheduledTasks.containsKey(pageId)) return false;
+        if (!registeredPageWatchers.containsKey(pageId)) return false;
+
+        registeredPageWatchers.remove(pageId);
+        registeredScheduledTasks.get(pageId).cancel(true);
+        registeredScheduledTasks.remove(pageId);
+
+        log.info(String.format("Removed page watcher from %s bot. Page id = %d, description = %s", description.getName(), pageId, pageDescription.getDescription()));
+        return true;
     }
 
     public void send(List<ItemDescription> items) {

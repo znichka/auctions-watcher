@@ -1,19 +1,13 @@
 package watcherbot.config;
 
 import org.mockito.Mockito;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import watcherbot.bot.TelegramBotSender;
-import watcherbot.repository.PageWatcherRepository;
-import watcherbot.repository.PageWatchersManagerRepository;
-import watcherbot.service.PageWatcherService;
+import watcherbot.repository.ManagerDescriptionRepository;
+import watcherbot.repository.PageDescriptionRepository;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,18 +24,23 @@ public class ConfigurationControllerTestConfig {
     }
 
     @Bean
-    public PageWatchersManagerRepository getMockPageWatchersManagerRepository() {
-        return Mockito.mock(PageWatchersManagerRepository.class);
+    public ManagerDescriptionRepository getMockPageWatchersManagerRepository() {
+        return Mockito.mock(ManagerDescriptionRepository.class);
     }
 
     @Bean
-    public PageWatcherRepository getMockPageWatcherRepository() {
-        return Mockito.mock(PageWatcherRepository.class);
+    public PageDescriptionRepository getMockPageWatcherRepository() {
+        return Mockito.mock(PageDescriptionRepository.class);
     }
 
     @Bean
     public TelegramBotSender getTelegramBotSender(){
         return Mockito.mock(TelegramBotSender.class);
+    }
+
+    @Bean
+    public NamedParameterJdbcTemplate getItemsService() {
+        return Mockito.mock(NamedParameterJdbcTemplate.class);
     }
 
 }

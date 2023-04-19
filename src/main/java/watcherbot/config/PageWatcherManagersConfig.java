@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @Log
 @Configuration
@@ -14,6 +15,8 @@ import java.util.concurrent.ScheduledExecutorService;
 public class PageWatcherManagersConfig {
     @Bean
     public static ScheduledExecutorService getScheduledExecutorService() {
-        return Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
+        ScheduledThreadPoolExecutor service = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
+        service.setRemoveOnCancelPolicy(true);
+        return service;
     }
 }
