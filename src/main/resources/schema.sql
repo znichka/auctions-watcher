@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS managers_pages (
 CREATE TABLE IF NOT EXISTS items (
    item_id VARCHAR(32) NOT NULL,
    manager_id INT NOT NULL,
-   image_hash VARCHAR(64) NOT NULL,
+   image_hash VARCHAR(64),
    last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-   url VARCHAR(500),
+   url VARCHAR(1000),
    PRIMARY KEY (item_id, manager_id)
 );

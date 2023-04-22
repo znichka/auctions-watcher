@@ -74,7 +74,7 @@ public class PageWatchersManager  {
             registeredScheduledTasks.put(pageWatcher.description.getId(), future);
             registeredPageWatchers.put(pageWatcher.description.getId(), pageWatcher);
         }
-        send("Page watcher for " + pageWatcher.getDescription() + " has been added");
+//        send("Page watcher for " + pageWatcher.getDescription() + " has been added");
     }
 
     public boolean removePageWatcher(PageDescription pageDescription) {

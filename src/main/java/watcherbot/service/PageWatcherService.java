@@ -26,9 +26,10 @@ public class PageWatcherService {
 
     @Autowired
     ManagerDescriptionRepository managerDescriptionRepository;
-
     @Autowired
     PageDescriptionRepository pageDescriptionRepository;
+    @Autowired
+    ItemsService itemsService;
 
     @Autowired
     PageParserFactory availableParsers;
@@ -37,10 +38,14 @@ public class PageWatcherService {
     @Autowired
     ObjectProvider<PageWatchersManager> pageWatchersManagerProvider;
 
+
     public PageDescription addPage(PageDescription pageDescription, int managerId) {
         pageDescriptionRepository.save(pageDescription);
         getManagerDescription(managerId).addPage(pageDescription);
-        loadPageWatcher(pageDescription, managerId);
+        PageWatcher pageWatcher = loadPageWatcher(pageDescription, managerId);
+        if (pageWatcher != null) {
+            pageWatcher.getNewItems().forEach(item -> itemsService.insertIfUnique(item, managerId));
+        }
         return pageDescription;
     }
 
@@ -72,19 +77,22 @@ public class PageWatcherService {
         }
     }
 
-    private void loadPageWatchersManager(ManagerDescription managerDescription) {
+    private PageWatchersManager loadPageWatchersManager(ManagerDescription managerDescription) {
         PageWatchersManager manager = pageWatchersManagerProvider.getObject(managerDescription);
         workerList.put(manager.getId(), manager);
         managerDescription.getPages().forEach(p -> loadPageWatcher(p, managerDescription.getId()));
+        return manager;
     }
 
-    private void loadPageWatcher(PageDescription pageDescription, int managerId) {
+    private PageWatcher loadPageWatcher(PageDescription pageDescription, int managerId) {
         try {
             PageWatcher pageWatcher = pageWatcherProvider.getObject(availableParsers.getParserFor(pageDescription.getUrl()), pageDescription);
             getPageWatchersManager(managerId).registerPageWatcher(pageWatcher);
+            return pageWatcher;
         } catch (Exception e) {
             log.severe("Error while adding " + pageDescription.getDescription());
         }
+        return null;
     }
 
     private PageWatchersManager getPageWatchersManager(int managerId) {
