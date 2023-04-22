@@ -4,6 +4,9 @@ import lombok.extern.java.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.BeansException;
@@ -28,13 +31,21 @@ public abstract class SeleniumAbstractPageParser extends AbstractPageParser  {
         try (AutoCloseableWebDriver driver = webDriverProvider.getObject()) {
             driver.get(url);
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(expectedCondition());
+            try
+            {
+                wait.until(expectedCondition());
+            } catch (Exception e) {
+                LogEntries logs = driver.manage().logs().get(LogType.BROWSER);
+                logs.getAll().forEach(l -> log.warning(l.getMessage()));
+                throw e;
+            }
             return Jsoup.parse(driver.getPageSource());
         } catch (BeansException e) {
             log.warning(String.format("Web driver for parser %s is not available, falling back to default parsing method", this.getDomainName()));
             return super.getDocument(url);
         } catch (Exception e){
             log.warning(String.format("Error while parsing the page, possible timeout. Url: %s", url));
+            System.out.println(e.getMessage());
             throw e;
         }
     }

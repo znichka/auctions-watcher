@@ -26,7 +26,14 @@ public class WebDriverConfig {
     @Profile("local")
     public static AutoCloseableWebDriver getLocalWebDriver() {
         WebDriverManager.chromedriver().setup();
-        return new AutoCloseableWebDriver(new ChromeDriver());
+        ChromeOptions options = new ChromeOptions();
+
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Safari/605.1.15");
+        options.addArguments("--remote-allow-origins=*");
+
+        return new AutoCloseableWebDriver(new ChromeDriver(options));
     }
 
     @Bean(destroyMethod = "quit", name = "webDriver")
@@ -37,6 +44,8 @@ public class WebDriverConfig {
 
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Safari/605.1.15");
+        options.addArguments("--remote-allow-origins=*");
 
         WebDriver driver = CompletableFuture.supplyAsync(() -> {
             try {
