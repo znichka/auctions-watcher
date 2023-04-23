@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
@@ -39,14 +41,17 @@ public class PageWatchersManager  {
     final Map<Integer, PageWatcher> registeredPageWatchers;
     final Map<Integer, ScheduledFuture<?>> registeredScheduledTasks;
 
+    LinkedBlockingQueue<ItemDescription> items;
+
     public PageWatchersManager(ManagerDescription description) {
         this.description = description;
 
         registeredPageWatchers = new HashMap<>();
         registeredScheduledTasks = new HashMap<>();
+        items = new LinkedBlockingQueue<>();
     }
 
-    public synchronized List<ItemDescription> filterUniqueItems(List<ItemDescription> items){
+    public List<ItemDescription> filterUniqueItems(List<ItemDescription> items){
         return items.stream().filter(item ->  itemsService.insertIfUnique(item, description.getId()))
                       .peek(item -> {
                           if (item.getPhotoUrl() == null)
@@ -57,27 +62,28 @@ public class PageWatchersManager  {
 
     public void registerPageWatcher(PageWatcher pageWatcher){
         Runnable runnable = () -> {
-            try {
-                log.info(String.format("Run for a page - %s", pageWatcher.getDescription()));
-                List<ItemDescription> newItems = filterUniqueItems(pageWatcher.getNewItems());
-                if (newItems.size() != 0) {
-                    log.info(String.format("New items for %s page for %s bot", pageWatcher.getDescription(), description.getName()));
-                    send(newItems);
-                }
-            } catch (Exception e) {
-                log.severe(String.format("Error while parsing the page. Url: %s", pageWatcher.getDescription()));
-                log.severe(e.getMessage());
-            }
+            log.info(String.format("Run for a page - %s", pageWatcher.getDescription()));
+            CompletableFuture.supplyAsync(pageWatcher::getNewItems)
+                    .exceptionally(e -> {
+                        log.severe(String.format("Error while parsing the page. Url: %s", pageWatcher.getDescription()));
+                        log.severe(e.getMessage());
+                        return List.of();
+                    })
+                    .thenApply(this::filterUniqueItems)
+                    .thenAccept(items -> {
+                        log.info(String.format("%d new items for %s page for %s bot", items.size(), pageWatcher.getDescription(), description.getName()));
+                        send(items);
+                    });
         };
+
         synchronized (this) {
-            ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(runnable, 0, pageWatcher.getPeriod(), MINUTES);
+            ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(runnable, 1, pageWatcher.getPeriod(), MINUTES);
             registeredScheduledTasks.put(pageWatcher.description.getId(), future);
             registeredPageWatchers.put(pageWatcher.description.getId(), pageWatcher);
         }
-//        send("Page watcher for " + pageWatcher.getDescription() + " has been added");
     }
 
-    public boolean removePageWatcher(PageDescription pageDescription) {
+    public synchronized boolean removePageWatcher(PageDescription pageDescription) {
         int pageId = pageDescription.getId();
         if (!registeredScheduledTasks.containsKey(pageId)) return false;
         if (!registeredPageWatchers.containsKey(pageId)) return false;
@@ -91,7 +97,6 @@ public class PageWatchersManager  {
     }
 
     public void send(List<ItemDescription> items) {
-        log.info("Update for the " + description.getName() + " bot");
         for(ItemDescription item : items) {
             try  {
                 sender.sendItemDescription(description.getCredentials(), item);

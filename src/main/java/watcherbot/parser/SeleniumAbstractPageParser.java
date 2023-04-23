@@ -27,7 +27,7 @@ public abstract class SeleniumAbstractPageParser extends AbstractPageParser  {
     protected abstract ExpectedCondition<WebElement> expectedCondition();
 
     @Override
-    protected Document getDocument(String url) throws IOException {
+    protected synchronized Document getDocument(String url) throws IOException {
         try (AutoCloseableWebDriver driver = webDriverProvider.getObject()) {
             driver.get(url);
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
