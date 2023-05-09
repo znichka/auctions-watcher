@@ -29,7 +29,14 @@ public class ItemsService {
             "ON CONFLICT DO NOTHING";
 
     public boolean insertIfUnique(ItemDescription item, int managerId) {
-        return insertIfUnique(item.getId(), item.getPhotoHash(), item.getItemUrl(), managerId);
+        try {
+            return insertIfUnique(item.getId(), item.getPhotoHash(), item.getItemUrl(), managerId);
+        }
+        catch (Exception e) {
+            log.severe("Error while saving an item to db. Url:" + item.getItemUrl());
+            log.severe(e.getMessage());
+            return false;
+        }
     }
 
     public boolean insertIfUnique(String itemId, String imageHash, String url, int managerId) {
@@ -45,7 +52,7 @@ public class ItemsService {
 
             return jdbcTemplate.update(sql, paramMap) == 1;
         } catch (Exception e) {
-            log.severe("Error while saving item to db. URL: " + url);
+            log.severe("Error while saving an item to db. URL: " + url);
             throw e;
         }
     }
