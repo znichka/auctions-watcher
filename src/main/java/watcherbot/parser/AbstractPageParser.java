@@ -39,10 +39,12 @@ public abstract class AbstractPageParser {
                     if (item != null) items.add(item);
                 } catch (Exception e) {
                     log.warning("Error while parsing an item on a page, skipping. Url: "+ url);
+                    log.warning(e.getMessage());
                 }
             }
         } catch (Exception e) {
             log.warning("Error while parsing a page, skipping. Url: "+ url);
+            log.warning(e.getMessage());
         }
         return items;
     }
