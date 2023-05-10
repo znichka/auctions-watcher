@@ -3,9 +3,11 @@ package watcherbot.parser;
 import lombok.extern.java.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.logging.LogEntries;
-import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -26,11 +28,20 @@ public abstract class SeleniumAbstractPageParser extends AbstractPageParser  {
 
     protected abstract ExpectedCondition<WebElement> expectedCondition();
 
+    protected boolean scroll = false;
+
     @Override
     protected Document getDocument(String url) throws IOException {
         try (AutoCloseableWebDriver driver = webDriverProvider.getObject()) {
             driver.get(url);
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+            if (scroll) {
+                int pageCount = 10;
+                for (int i=0;i<pageCount;i++)
+                    new Actions(driver).keyDown(Keys.SPACE).pause(1000).keyUp(Keys.SPACE).perform();
+            }
+
             try
             {
                 wait.until(expectedCondition());

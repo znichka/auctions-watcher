@@ -4,12 +4,15 @@ import lombok.extern.java.Log;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Interactive;
+import org.openqa.selenium.interactions.Sequence;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 @Log
-public class AutoCloseableWebDriver implements AutoCloseable, WebDriver {
+public class AutoCloseableWebDriver implements AutoCloseable, WebDriver, Interactive {
     WebDriver webDriver;
 
     public AutoCloseableWebDriver(WebDriver webDriver) {
@@ -80,5 +83,15 @@ public class AutoCloseableWebDriver implements AutoCloseable, WebDriver {
     @Override
     public Options manage() {
         return webDriver.manage();
+    }
+
+    @Override
+    public void perform(Collection<Sequence> actions) {
+        ((Interactive)webDriver).perform(actions);
+    }
+
+    @Override
+    public void resetInputState() {
+        ((Interactive)webDriver).resetInputState();
     }
 }
