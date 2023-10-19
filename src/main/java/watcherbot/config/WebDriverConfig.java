@@ -24,7 +24,7 @@ public class WebDriverConfig {
     @Bean(destroyMethod = "quit", name = "webDriver")
     @Scope("prototype")
     @Profile("local")
-    public static AutoCloseableWebDriver getLocalWebDriver() {
+    public static synchronized AutoCloseableWebDriver getLocalWebDriver() {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
 
@@ -39,7 +39,7 @@ public class WebDriverConfig {
     @Bean(destroyMethod = "quit", name = "webDriver")
     @Scope("prototype")
     @Profile({"!local"})
-    public static AutoCloseableWebDriver getRemoteWebDriver(@Value("${docker.chromedriver.url}") String dockerChomeDriverUrl ) throws ExecutionException, InterruptedException {
+    public static synchronized AutoCloseableWebDriver getRemoteWebDriver(@Value("${docker.chromedriver.url}") String dockerChomeDriverUrl ) throws ExecutionException, InterruptedException {
         ChromeOptions options = new ChromeOptions();
 
         options.addArguments("--no-sandbox");

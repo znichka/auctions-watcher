@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import watcherbot.bot.SenderQueue;
 import watcherbot.bot.TelegramBotSender;
 import watcherbot.description.ItemDescription;
 import watcherbot.description.ManagerDescription;
@@ -31,8 +32,11 @@ public class PageWatchersManager  {
 
     @Value("${noimage.link}")
     String NO_IMAGE_LINK;
+//    @Autowired
+//    TelegramBotSender sender;
     @Autowired
-    TelegramBotSender sender;
+    SenderQueue senderQueue;
+
     @Autowired
     ScheduledExecutorService scheduledExecutorService;
     @Autowired
@@ -72,7 +76,7 @@ public class PageWatchersManager  {
                     .thenApply(this::filterUniqueItems)
                     .thenAccept(items -> {
                         log.info(String.format("%d new items for %s page for %s bot", items.size(), pageWatcher.getDescription(), description.getName()));
-                        send(items);
+                        senderQueue.send(description.getCredentials(), items);
                     });
         };
 
@@ -96,23 +100,23 @@ public class PageWatchersManager  {
         return true;
     }
 
-    public void send(List<ItemDescription> items) {
-        for(ItemDescription item : items) {
-            try  {
-                sender.sendItemDescription(description.getCredentials(), item);
-            } catch (IOException e) {
-                log.severe(String.format("Error while sending item details to telegram bot %s. Item photo url: %s, item url: %s", description.getName(), item.getPhotoUrl(), item.getItemUrl()));
-            }
-        }
-    }
+//    public void send(List<ItemDescription> items) {
+//        for(ItemDescription item : items) {
+//            try  {
+//                sender.sendItemDescription(description.getCredentials(), item);
+//            } catch (IOException e) {
+//                log.severe(String.format("Error while sending item details to telegram bot %s. Item photo url: %s, item url: %s", description.getName(), item.getPhotoUrl(), item.getItemUrl()));
+//            }
+//        }
+//    }
 
-    public void send(String message) {
-        try {
-            sender.sendMessage(description.getCredentials(), message);
-        } catch (IOException e) {
-            log.severe(String.format("Error while sending message to telegram bot %s. Message: %s", description.getName(), message));
-        }
-    }
+//    public void send(String message) {
+//        try {
+//            sender.sendMessage(description.getCredentials(), message);
+//        } catch (IOException e) {
+//            log.severe(String.format("Error while sending message to telegram bot %s. Message: %s", description.getName(), message));
+//        }
+//    }
 
     public int getId() {
         return description.getId();

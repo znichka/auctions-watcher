@@ -8,6 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import watcherbot.bot.SenderQueue;
 import watcherbot.description.ManagerDescription;
 import watcherbot.description.TelegramBotCredentials;
 import watcherbot.bot.TelegramBotSender;
@@ -27,6 +28,11 @@ public class PageWatchersManagerTestConfig {
     @Bean
     TelegramBotSender getMockTelegramBotSender() {
         return Mockito.mock(TelegramBotSender.class);
+    }
+
+    @Bean
+    public SenderQueue getSenderQueue(){
+        return Mockito.mock(SenderQueue.class);
     }
 
     @Bean

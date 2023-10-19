@@ -31,7 +31,7 @@ public abstract class SeleniumAbstractPageParser extends AbstractPageParser  {
     protected boolean scroll = false;
 
     @Override
-    protected synchronized Document getDocument(String url) throws IOException {
+    protected Document getDocument(String url) throws IOException {
         try (AutoCloseableWebDriver driver = webDriverProvider.getObject()) {
             driver.get(url);
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
