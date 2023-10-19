@@ -99,6 +99,6 @@ fabric.properties
 *temp*
 */config jsons/
 
-*.yml
+
 *.sh
 *-dev.sql
