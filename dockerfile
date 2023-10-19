@@ -1,6 +1,4 @@
 FROM eclipse-temurin:17-jre
-# RUN addgroup -S watcherbot.watchers && adduser -S watcherbot.watchers -G watcherbot.watchers
-# USER watcherbot.watchers:watcherbot.watchers
 
 COPY target/classes classes
 COPY target/dependency dependency
