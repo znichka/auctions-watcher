@@ -16,6 +16,7 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import watcherbot.driver.AutoCloseableWebDriver;
+import watcherbot.driver.WebDriverPool;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -23,8 +24,11 @@ import java.time.Duration;
 @Component
 @Log
 public abstract class SeleniumAbstractPageParser extends AbstractPageParser  {
+//    @Autowired
+//    private ObjectFactory<AutoCloseableWebDriver> webDriverProvider;
+
     @Autowired
-    private ObjectFactory<AutoCloseableWebDriver> webDriverProvider;
+    WebDriverPool webDriverPool;
 
     protected abstract ExpectedCondition<WebElement> expectedCondition();
 
@@ -32,25 +36,8 @@ public abstract class SeleniumAbstractPageParser extends AbstractPageParser  {
 
     @Override
     protected Document getDocument(String url) throws IOException {
-        try (AutoCloseableWebDriver driver = webDriverProvider.getObject()) {
-            driver.get(url);
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
-            if (scroll) {
-                int pageCount = 10;
-                for (int i=0;i<pageCount;i++)
-                    new Actions(driver).keyDown(Keys.SPACE).pause(1000).keyUp(Keys.SPACE).perform();
-            }
-
-            try
-            {
-                wait.until(expectedCondition());
-            } catch (Exception e) {
-                LogEntries logs = driver.manage().logs().get(LogType.BROWSER);
-                logs.getAll().forEach(l -> log.warning(l.getMessage()));
-                throw e;
-            }
-            return Jsoup.parse(driver.getPageSource());
+        try {
+            return Jsoup.parse(webDriverPool.get(url, scroll, expectedCondition()));
         } catch (BeansException e) {
             log.warning(String.format("Web driver for parser %s is not available, falling back to default parsing method", this.getDomainName()));
             return super.getDocument(url);

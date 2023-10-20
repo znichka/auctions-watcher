@@ -12,9 +12,7 @@ import watcherbot.driver.AutoCloseableWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 @Log
 @Configuration
@@ -47,19 +45,16 @@ public class WebDriverConfig {
         options.addArguments("--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Safari/605.1.15");
         options.addArguments("--remote-allow-origins=*");
 
-        WebDriver driver = CompletableFuture.supplyAsync(() -> {
-            try {
-                return new RemoteWebDriver(new URL(dockerChomeDriverUrl), options);
-            } catch (MalformedURLException e) {
-                log.severe(String.format("Web driver not created, url is %s, exception message is %s", dockerChomeDriverUrl, e.getMessage()));
-                return null;
-            }
-        }).completeOnTimeout(null,10, TimeUnit.SECONDS).exceptionally(t -> {
-            log.severe(String.format("Web driver not created, url is %s, exception message is %s", dockerChomeDriverUrl, t.getMessage()));
-            return null;
-        }).get();
+        WebDriver driver = null;
+        try {
+            driver = new RemoteWebDriver(new URL(dockerChomeDriverUrl), options);
+        } catch (MalformedURLException e) {
+            log.severe(String.format("Web driver not created, url is %s, exception message is %s", dockerChomeDriverUrl, e.getMessage()));
+            e.printStackTrace();
+        }
 
-        if (driver == null) log.severe("Web driver not created, possible timeout. Url is " + dockerChomeDriverUrl);
+        if (driver == null)
+            log.severe("Web driver not created, possible timeout. Url is " + dockerChomeDriverUrl);
         return new AutoCloseableWebDriver(driver);
     }
 }

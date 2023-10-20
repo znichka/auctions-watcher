@@ -101,4 +101,6 @@ fabric.properties
 
 
 *.sh
+*.py
+*-test.yml
 *-dev.sql

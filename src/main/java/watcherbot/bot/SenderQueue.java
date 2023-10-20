@@ -29,7 +29,7 @@ public class SenderQueue {
         });
     }
 
-    public synchronized void send(TelegramBotCredentials credentials, List<ItemDescription> items){
+    public void send(TelegramBotCredentials credentials, List<ItemDescription> items){
         for (var item : items) {
             send(credentials, item);
         }
