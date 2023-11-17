@@ -1,0 +1,169 @@
+openapi: "3.1.0"
+info:
+  title: "auctions_watcher API"
+  description: "auctions_watcher API"
+  version: "1.0.0"
+servers:
+  - url: "https://auctions_watcher"
+paths:
+  /bots:
+    get:
+      summary: "GET bots"
+      operationId: "getAllManagers"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ManagerDescription"
+    post:
+      summary: "POST bots"
+      operationId: "addManager"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ManagerDescription"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ManagerDescription"
+  /bots/{manager_id}:
+    get:
+      summary: "GET bots/{manager_id}"
+      operationId: "getManager"
+      parameters:
+        - name: "manager_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ManagerDescription"
+  /bots/{manager_id}/pages:
+    get:
+      summary: "GET bots/{manager_id}/pages"
+      operationId: "getAllPages"
+      parameters:
+        - name: "manager_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/PageDescription"
+    post:
+      summary: "POST bots/{manager_id}/pages"
+      operationId: "addPage"
+      parameters:
+        - name: "manager_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PageDescription"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageDescription"
+  /bots/{manager_id}/pages/{page_id}:
+    delete:
+      summary: "DELETE bots/{manager_id}/pages/{page_id}"
+      operationId: "deletePage"
+      parameters:
+        - name: "manager_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "page_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "boolean"
+  /health:
+    get:
+      summary: "GET health"
+      operationId: "healthcheck"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+components:
+  schemas:
+    TelegramBotCredentials:
+      type: "object"
+      properties:
+        token:
+          type: "string"
+        chatId:
+          type: "string"
+    PageDescription:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int32"
+        url:
+          type: "string"
+        description:
+          type: "string"
+        period:
+          type: "integer"
+          format: "int32"
+    ManagerDescription:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int32"
+        credentials:
+          $ref: "#/components/schemas/TelegramBotCredentials"
+        name:
+          type: "string"
+        pages:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/PageDescription"
